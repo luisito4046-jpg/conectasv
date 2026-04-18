@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
     getApplicationsByJob, getApplicationsByCandidate,
     createApplication, updateApplicationStatus, deleteApplication
-} from '../controllers/applicationsServices.js';
+} from '../controllers/applications.controller.js';
 
 const router = Router();
 
