@@ -3,14 +3,14 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// ✅ TODAS las importaciones juntas al inicio del archivo
-import usersRouter from './routes/users.js';
-import companiesRouter from './routes/companies.js';
-import loginRouter from './routes/login.js';
-import jobsRouter from './routes/jobs.js';
-import applicationsRouter from './routes/applications.js';
-import savedJobsRouter from './routes/savedJobs.js';
-import alertsRouter from './routes/alerts.js';
+// TODAS las importaciones juntas al inicio del archivo
+import usersRouter from './routes/users.routes.js';
+import companiesRouter from './routes/companies.routes.js';
+import loginRouter from './routes/login.routes.js';
+import jobsRouter from './routes/jobs.routes.js';
+import applicationsRouter from './routes/applications.routes.js';
+import savedJobsRouter from './routes/savedJobs.routes.js';
+import alertsRouter from './routes/alerts.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

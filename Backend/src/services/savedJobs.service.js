@@ -1,4 +1,4 @@
-import { pool } from '../db.js';
+import { pool } from '../config/db.js';
 
 export const findSavedJobsByUser = async (userId) => {
     const result = await pool.query(

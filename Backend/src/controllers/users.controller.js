@@ -70,3 +70,15 @@ export const eliminarUsuario = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const actualizarFotoPerfil = async (req, res) => {
+    try {
+        const url = req.file?.path; // Cloudinary pone la URL aquí
+        if (!url) return res.status(400).json({ error: 'No se recibió ninguna imagen.' });
+
+        const user = await updateUser(req.params.id, { profile_photo_url: url });
+        res.json({ message: 'Foto actualizada', profile_photo_url: url });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
