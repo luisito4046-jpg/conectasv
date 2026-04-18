@@ -1,0 +1,1082 @@
+/* ================================================================
+   TALENTOBRIDGE – ESTILOS PRINCIPALES
+   Paleta: Azul profundo + ámbar cálido + fondo crema/blanco roto
+   Tipografía: DM Serif Display (títulos) + DM Sans (cuerpo)
+   ================================================================ */
+
+/* ── VARIABLES GLOBALES ─────────────────────────────────────── */
+:root {
+  --primary:    #1a3a5c;   /* Azul marino profundo */
+  --primary-l:  #2a5f9e;   /* Azul medio (hover) */
+  --accent:     #e8943a;   /* Ámbar cálido */
+  --accent-l:   #f0ac5e;   /* Ámbar claro */
+  --bg:         #f7f5f0;   /* Fondo crema */
+  --surface:    #ffffff;   /* Superficies / tarjetas */
+  --border:     #e2ddd6;   /* Bordes sutiles */
+  --text:       #1c1917;   /* Texto principal */
+  --text-m:     #6b6560;   /* Texto secundario */
+  --text-l:     #a09790;   /* Texto tenue */
+  --danger:     #dc2626;   /* Errores / peligro */
+  --success:    #16a34a;
+  --warning:    #d97706;
+  --radius:     12px;
+  --radius-lg:  20px;
+  --shadow:     0 2px 16px rgba(26,58,92,.10);
+  --shadow-lg:  0 8px 40px rgba(26,58,92,.16);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
+  --font-title: 'DM Serif Display', serif;
+  --font-body:  'DM Sans', sans-serif;
+}
+
+/* ── RESET Y BASE ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,h2,h3,h4,h5,h6 { font-family: var(--font-title); }
+
+/* ── VISTAS SPA ─────────────────────────────────────────────── */
+/* Cada sección de la SPA está oculta por defecto */
+.tb-view          { display: none; animation: fadeSlide .35s ease both; }
+.tb-view.active   { display: block; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── NAVBAR ─────────────────────────────────────────────────── */
+.tb-navbar {
+  background: var(--primary);
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+  box-shadow: 0 2px 20px rgba(26,58,92,.25);
+}
+
+.tb-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff !important;
+}
+
+.brand-icon {
+  width: 36px; height: 36px;
+  background: #1e2d45;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+/* "SV" en azul eléctrico igual que el logo */
+.brand-sv {
+  color: #4d9cf8;
+  font-weight: 800;
+}
+
+.brand-text {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  font-weight: 300;
+  letter-spacing: -.02em;
+}
+.brand-text strong { font-weight: 700; }
+
+/* Links del nav */
+.tb-nav-link {
+  color: rgba(255,255,255,.75) !important;
+  font-size: .9rem;
+  font-weight: 500;
+  padding: 7px 14px !important;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+.tb-nav-link:hover {
+  color: #fff !important;
+  background: rgba(255,255,255,.12);
+}
+
+/* Badge de usuario en el nav */
+.tb-user-badge {
+  display: flex; align-items: center; gap: 10px;
+  color: #fff;
+  font-size: .9rem;
+}
+
+.user-avatar {
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: .8rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── BOTONES ─────────────────────────────────────────────────── */
+.tb-btn-primary {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 10px;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.tb-btn-primary:hover {
+  background: var(--accent-l);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(232,148,58,.4);
+}
+
+.tb-btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+  padding: 8px 22px;
+  border-radius: 10px;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.tb-btn-outline:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.tb-btn-ghost {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 10px;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.tb-btn-ghost:hover {
+  background: rgba(255,255,255,.22);
+  color: #fff;
+}
+
+/* Ghost oscuro (sobre fondo claro) */
+.tb-btn-ghost-dark {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-m);
+  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: 9px;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.tb-btn-ghost-dark:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tb-btn-danger {
+  background: var(--danger);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.tb-btn-danger:hover { background: #b91c1c; color: #fff; }
+
+/* ── HERO SECTION ───────────────────────────────────────────── */
+.tb-hero {
+  background: linear-gradient(145deg, var(--primary) 0%, #0f2540 100%);
+  padding: 80px 0 90px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-pattern {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(232,148,58,.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(42,95,158,.3) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.min-vh-70 { min-height: 70vh; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(232,148,58,.18);
+  border: 1px solid rgba(232,148,58,.35);
+  color: var(--accent-l);
+  font-size: .82rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 50px;
+  letter-spacing: .03em;
+}
+
+.tb-hero-title {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin-bottom: 1rem;
+}
+.tb-hero-title em { color: var(--accent-l); font-style: italic; }
+
+.tb-hero-sub {
+  color: rgba(255,255,255,.72);
+  font-size: 1.05rem;
+  max-width: 480px;
+}
+
+/* Tarjetas flotantes decorativas del hero */
+.hero-card-float {
+  position: relative;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-central-icon {
+  width: 120px; height: 120px;
+  background: var(--accent);
+  border-radius: 30px;
+  display: grid; place-items: center;
+  font-size: 3rem;
+  color: #fff;
+  box-shadow: 0 20px 60px rgba(232,148,58,.45);
+  animation: floatCenter 3s ease-in-out infinite;
+}
+
+@keyframes floatCenter {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+.floating-card {
+  position: absolute;
+  background: rgba(255,255,255,.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 500;
+  white-space: nowrap;
+  animation: floatCard 4s ease-in-out infinite;
+}
+.card-1 { top: 60px; right: 20px; animation-delay: 0s; }
+.card-2 { bottom: 80px; right: 40px; animation-delay: 1.3s; }
+.card-3 { top: 180px; left: 0; animation-delay: 0.7s; }
+
+@keyframes floatCard {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(1deg); }
+}
+
+/* ── BUSCADOR AVANZADO ──────────────────────────────────────── */
+.tb-search-section {
+  padding: 0;
+  transform: translateY(-40px);
+  margin-bottom: -40px;
+  position: relative;
+  z-index: 10;
+}
+
+.tb-search-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+.tb-search-title {
+  font-size: 1.1rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+/* ── CHIPS / ETIQUETAS RÁPIDAS ───────────────────────────────── */
+.tb-tag-label { color: var(--text-m); font-size: .82rem; font-weight: 600; }
+
+.tb-chip {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--text-m);
+  font-size: .8rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.tb-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(232,148,58,.07);
+}
+
+/* ── MÉTRICAS ────────────────────────────────────────────────── */
+.tb-metrics { padding: 80px 0 60px; }
+
+.tb-metric-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  text-align: center;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.tb-metric-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+.metric-icon {
+  width: 56px; height: 56px;
+  background: color-mix(in srgb, var(--mic) 12%, transparent);
+  border-radius: 16px;
+  display: grid; place-items: center;
+  font-size: 1.5rem;
+  color: var(--mic);
+  margin: 0 auto 14px;
+}
+
+.metric-value {
+  font-family: var(--font-title);
+  font-size: 2.2rem;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.metric-label {
+  font-size: .82rem;
+  color: var(--text-m);
+  font-weight: 500;
+}
+
+/* ── SECCIÓN DE EMPLEOS DESTACADOS ──────────────────────────── */
+.tb-featured { padding-top: 60px; }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.tb-section-title {
+  font-size: 1.8rem;
+  color: var(--primary);
+}
+
+.tb-link-more {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+.tb-link-more:hover { gap: 10px; color: var(--accent); }
+
+/* Tarjeta de empleo */
+.tb-job-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: var(--transition);
+  cursor: pointer;
+  height: 100%;
+}
+.tb-job-card:hover {
+  border-color: var(--primary-l);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.job-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.company-logo {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+}
+
+.job-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 2px;
+  font-family: var(--font-body);
+  line-height: 1.3;
+}
+
+.company-name {
+  font-size: .85rem;
+  color: var(--text-m);
+}
+
+.job-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tb-tag {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-type  { background: #eff6ff; color: #1d4ed8; }
+.tag-level { background: #f0fdf4; color: #166534; }
+.tag-area  { background: #fdf4ff; color: #7e22ce; }
+.tag-remote{ background: #fff7ed; color: #c2410c; }
+
+.job-salary {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.job-location {
+  font-size: .82rem;
+  color: var(--text-m);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.job-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-date { font-size: .78rem; color: var(--text-l); }
+
+/* ── ENCABEZADOS DE PÁGINAS INTERNAS ─────────────────────────── */
+.tb-page-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #1a3a6e 100%);
+  padding: 48px 0;
+}
+
+.tb-page-title {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.tb-page-sub { color: rgba(255,255,255,.7); font-size: .95rem; }
+
+/* ── SIDEBAR DE FILTROS ──────────────────────────────────────── */
+.tb-filter-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  position: sticky;
+  top: 80px;
+}
+
+.tb-filter-title {
+  font-family: var(--font-body);
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.tb-check-group .form-check { margin-bottom: 8px; }
+.form-check-input:checked {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+.tb-results-count { font-size: .88rem; color: var(--text-m); font-weight: 500; }
+
+/* Tarjeta de empleo en modo lista */
+.tb-job-list-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+.tb-job-list-card:hover {
+  border-color: var(--primary-l);
+  box-shadow: var(--shadow);
+  transform: translateX(4px);
+}
+
+/* ── TARJETAS GENERALES ──────────────────────────────────────── */
+.tb-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  height: fit-content;
+}
+
+.tb-card-title {
+  font-family: var(--font-body);
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--bg);
+}
+
+/* ── PERFIL: ESTADÍSTICAS MINI ───────────────────────────────── */
+.stat-mini {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-mini-val {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-mini-label { font-size: .78rem; color: var(--text-m); margin-top: 4px; }
+
+/* ── HABILIDADES ─────────────────────────────────────────────── */
+.tb-skill-tag {
+  background: rgba(26,58,92,.1);
+  color: var(--primary);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tb-skill-tag::after {
+  content: '×';
+  cursor: pointer;
+  color: var(--text-l);
+  font-size: .9rem;
+  transition: var(--transition);
+}
+.tb-skill-tag:hover::after { color: var(--danger); }
+
+/* ── ZONA DE CARGA DE CV ────────────────────────────────────── */
+.tb-upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-m);
+  font-size: .88rem;
+}
+.tb-upload-zone i { font-size: 2rem; color: var(--primary-l); }
+.tb-upload-zone:hover {
+  border-color: var(--accent);
+  background: rgba(232,148,58,.04);
+  color: var(--accent);
+}
+.tb-upload-zone.uploaded {
+  border-color: var(--success);
+  background: rgba(22,163,74,.05);
+  color: var(--success);
+}
+
+/* ── ALERTAS DEL CANDIDATO ───────────────────────────────────── */
+.tb-alert-item {
+  background: var(--bg);
+  border-radius: 9px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.alert-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
+.alert-dot.inactive { background: var(--text-l); }
+
+.alert-text { font-size: .82rem; color: var(--text); flex: 1; }
+
+.alert-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-m);
+  padding: 4px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+.alert-toggle:hover { color: var(--danger); background: rgba(220,38,38,.08); }
+
+/* ── VALORACIÓN DE ESTRELLAS ─────────────────────────────────── */
+.tb-star-rating {
+  display: flex;
+  gap: 6px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--border);
+  transition: var(--transition);
+  padding: 0;
+  line-height: 1;
+}
+.star-btn.active, .star-btn:hover { color: #f59e0b; }
+
+.rating-card {
+  background: var(--bg);
+  border-radius: 9px;
+  padding: 12px 14px;
+  font-size: .82rem;
+}
+
+.rating-company { font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+.rating-stars { color: #f59e0b; font-size: .85rem; }
+.rating-comment { color: var(--text-m); margin-top: 4px; }
+
+/* ── SAVED JOBS MINI ────────────────────────────────────────── */
+.saved-job-item {
+  background: var(--bg);
+  border-radius: 9px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: .82rem;
+}
+.saved-job-item:hover { background: rgba(26,58,92,.07); }
+.saved-job-title { font-weight: 600; color: var(--primary); }
+.saved-job-co { color: var(--text-m); font-size: .76rem; }
+
+/* ── PANEL ADMIN ─────────────────────────────────────────────── */
+.admin-badge {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--accent), #c97520);
+  border-radius: 16px;
+  display: grid; place-items: center;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+.tb-admin-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+}
+.tb-admin-stat > i { font-size: 1.8rem; color: var(--primary-l); display: block; margin-bottom: 10px; }
+
+.as-value {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.as-label { font-size: .8rem; color: var(--text-m); margin-bottom: 10px; }
+.as-badge { font-size: .72rem; }
+
+/* ── TABLA GENERAL ───────────────────────────────────────────── */
+.tb-table {
+  margin: 0;
+  font-size: .88rem;
+}
+.tb-table th {
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-m);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 14px;
+  background: var(--bg);
+}
+.tb-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--bg);
+  vertical-align: middle;
+}
+.tb-table tr:last-child td { border-bottom: none; }
+.tb-table tbody tr:hover td { background: var(--bg); }
+
+/* ── MODALES ─────────────────────────────────────────────────── */
+.tb-modal .modal-content {
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.tb-modal-header {
+  background: var(--primary);
+  border: none;
+  padding: 20px 24px;
+  color: #fff;
+}
+
+.tb-modal .modal-title {
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Selector de roles en modales */
+.tb-role-selector { }
+
+.tb-role-btn {
+  flex: 1;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  color: var(--text-m);
+  border-radius: 10px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: .8rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+.tb-role-btn i { font-size: 1.3rem; }
+.tb-role-btn.active {
+  border-color: var(--accent);
+  background: rgba(232,148,58,.08);
+  color: var(--accent);
+}
+.tb-role-btn:hover:not(.active) {
+  border-color: var(--primary-l);
+  color: var(--primary);
+}
+
+/* Botón de ver/ocultar contraseña */
+.tb-eye-btn {
+  background: var(--bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-left: none !important;
+  color: var(--text-m) !important;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.tb-eye-btn:hover { color: var(--primary) !important; }
+
+/* Barra de fortaleza de contraseña */
+.pw-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+#pwBar { height: 100%; width: 0; border-radius: 2px; transition: .4s ease; }
+
+/* ── FORMULARIOS ─────────────────────────────────────────────── */
+.tb-label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-m);
+  margin-bottom: 6px;
+  letter-spacing: .02em;
+}
+
+.tb-input {
+  border: 1.5px solid var(--border) !important;
+  border-radius: 9px !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  font-family: var(--font-body) !important;
+  font-size: .9rem !important;
+  padding: 10px 14px !important;
+  transition: var(--transition) !important;
+}
+.tb-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(232,148,58,.15) !important;
+  background: #fff !important;
+  outline: none !important;
+}
+
+.tb-select {
+  border: 1.5px solid var(--border) !important;
+  border-radius: 9px !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  font-family: var(--font-body) !important;
+  font-size: .9rem !important;
+  padding: 10px 14px !important;
+  transition: var(--transition) !important;
+}
+.tb-select:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(232,148,58,.15) !important; outline: none !important; }
+
+.tb-input-group .input-group-text {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-right: none;
+  border-radius: 9px 0 0 9px;
+  color: var(--text-m);
+}
+.tb-input-group .form-control {
+  border-left: none !important;
+  border-radius: 0 9px 9px 0 !important;
+}
+
+/* ── PERFIL DE CANDIDATO EN MODAL ─────────────────────────────── */
+.profile-avatar-lg {
+  width: 72px; height: 72px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  border: 4px solid rgba(255,255,255,.3);
+}
+
+/* ── VACANTES PUBLICADAS (EMPLEADOR) ─────────────────────────── */
+.employer-job-card {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.ejc-info .ejc-title { font-weight: 700; color: var(--primary); font-size: .95rem; }
+.ejc-info .ejc-meta { font-size: .8rem; color: var(--text-m); }
+
+/* ── CONTENIDO REPORTADO (ADMIN) ─────────────────────────────── */
+.report-item {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-size: .82rem;
+}
+.report-title { font-weight: 700; color: var(--danger); margin-bottom: 2px; }
+.report-desc { color: var(--text-m); }
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.tb-toast {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── TEXTOS UTILITARIOS ──────────────────────────────────────── */
+.tb-text-muted { color: var(--text-m) !important; }
+.text-accent   { color: var(--accent) !important; }
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+.tb-footer {
+  background: var(--primary);
+  color: rgba(255,255,255,.8);
+  padding: 60px 0 30px;
+  margin-top: 80px;
+}
+
+.tb-footer-heading {
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+}
+
+.tb-footer-links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tb-footer-links a {
+  color: rgba(255,255,255,.65);
+  text-decoration: none;
+  font-size: .88rem;
+  transition: var(--transition);
+}
+.tb-footer-links a:hover { color: var(--accent-l); }
+
+.tb-footer-divider { border-color: rgba(255,255,255,.12); margin: 30px 0 20px; }
+
+.tb-social {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,.1);
+  border-radius: 9px;
+  display: grid; place-items: center;
+  color: rgba(255,255,255,.8);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+.tb-social:hover { background: var(--accent); color: #fff; }
+
+/* ── DETALLE DE EMPLEO ───────────────────────────────────────── */
+.job-detail-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.job-detail-title {
+  font-size: 1.6rem;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.job-detail-body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.job-detail-section h6 {
+  font-family: var(--font-body);
+  font-size: .82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-m);
+  margin-bottom: 12px;
+}
+
+.job-detail-side-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  position: sticky;
+  top: 90px;
+}
+
+/* ── BADGE DE ESTADO ─────────────────────────────────────────── */
+.status-badge {
+  font-size: .74rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.status-pending  { background: #fff7ed; color: #c2410c; }
+.status-review   { background: #eff6ff; color: #1d4ed8; }
+.status-accepted { background: #f0fdf4; color: #166534; }
+.status-rejected { background: #fef2f2; color: #991b1b; }
+
+/* ── LINK GENERAL ────────────────────────────────────────────── */
+.tb-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.tb-link:hover { color: var(--primary); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .tb-search-section { transform: none; margin-bottom: 0; padding: 0 0 20px; }
+  .tb-search-card { border-radius: 0; box-shadow: none; border-left: none; border-right: none; }
+  .tb-hero { padding: 50px 0 60px; }
+  .tb-hero-title { font-size: 2rem; }
+  .tb-metrics { padding: 40px 0; }
+  .hero-card-float { display: none; }
+}
+
+/* ── SCROLLBAR PERSONALIZADO ─────────────────────────────────── */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-l); }
+
+/* ── SELECCIÓN DE TEXTO ──────────────────────────────────────── */
+::selection { background: rgba(232,148,58,.25); color: var(--primary); }

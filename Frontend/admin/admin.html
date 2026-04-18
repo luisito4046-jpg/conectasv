@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ConectaSV – Panel Administrativo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+  <style>
+
+
+    :root {
+      --primary:    #1a3a5c;
+      --primary-l:  #2a5f9e;
+      --accent:     #e8943a;
+      --accent-l:   #f0ac5e;
+      --bg:         #f7f5f0;
+      --surface:    #ffffff;
+      --border:     #e2ddd6;
+      --text:       #1c1917;
+      --text-m:     #6b6560;
+      --text-l:     #a09790;
+      --danger:     #dc2626;
+      --success:    #16a34a;
+      --warning:    #d97706;
+      --radius:     12px;
+      --radius-lg:  20px;
+      --shadow:     0 2px 16px rgba(26,58,92,.10);
+      --shadow-lg:  0 8px 40px rgba(26,58,92,.16);
+      --transition: .2s cubic-bezier(.4,0,.2,1);
+      --font-title: 'DM Serif Display', serif;
+      --font-body:  'DM Sans', sans-serif;
+      --sidebar-w:  240px;
+      --topbar-h:   64px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    h1,h2,h3,h4,h5,h6 { font-family: var(--font-title); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::selection { background: rgba(232,148,58,.2); color: var(--primary); }
+
+    /* ── SIDEBAR ── */
+    .admin-sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--primary);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 100;
+      transition: transform var(--transition);
+      box-shadow: 4px 0 24px rgba(26,58,92,.18);
+    }
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: #1e2d45;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .brand-text {
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      font-weight: 300;
+      letter-spacing: -.02em;
+      color: #fff;
+    }
+    .brand-text strong { font-weight: 700; }
+    .brand-sv { color: #4d9cf8; font-weight: 800 !important; }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      padding: 18px 20px 6px;
+    }
+    .sidebar-nav { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+
+    .nav-link-sb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      color: rgba(255,255,255,.65);
+      font-size: 13.5px;
+      font-weight: 400;
+      text-decoration: none;
+      transition: all var(--transition);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-body);
+    }
+    .nav-link-sb i { font-size: 15px; flex-shrink: 0; }
+    .nav-link-sb:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .nav-link-sb.active {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(232,148,58,.35);
+    }
+    .badge-nav {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: rgba(220,38,38,.25);
+      color: #fca5a5;
+      font-weight: 700;
+      border: 1px solid rgba(220,38,38,.3);
+    }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,.1); }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: rgba(255,255,255,.08);
+      margin-bottom: 4px;
+    }
+    .user-avatar-sb {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .u-name { font-size: 13px; font-weight: 600; color: #fff; margin: 0; line-height: 1.3; }
+    .u-role { font-size: 11px; color: rgba(255,255,255,.45); margin: 0; }
+
+    /* ── TOPBAR ── */
+    .admin-topbar {
+      height: var(--topbar-h);
+      background: var(--primary);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 12px rgba(26,58,92,.15);
+    }
+    .topbar-title { font-size: 15px; font-weight: 600; color: #fff; }
+    .topbar-date  { font-size: 12px; color: rgba(255,255,255,.5); }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .topbar-icon-btn {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.75);
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+    }
+    .topbar-icon-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+    .notif-dot {
+      position: absolute;
+      top: 7px; right: 7px;
+      width: 7px; height: 7px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 1.5px solid var(--primary);
+    }
+    .topbar-badge-pending {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(232,148,58,.18);
+      color: var(--accent-l);
+      border: 1px solid rgba(232,148,58,.3);
+      font-weight: 600;
+    }
+
+    /* ── WRAPPER ── */
+    .admin-wrapper { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .admin-content { padding: 28px; flex: 1; }
+
+    .section-title {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-l);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── METRIC CARDS ── */
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 70px; height: 70px;
+      border-radius: 0 var(--radius) 0 70px;
+      opacity: .06;
+    }
+    .metric-card.c-blue::after   { background: var(--primary); }
+    .metric-card.c-accent::after { background: var(--accent); }
+    .metric-card.c-green::after  { background: var(--success); }
+    .metric-card.c-warn::after   { background: var(--warning); }
+    .metric-card.c-red::after    { background: var(--danger); }
+    .metric-card.c-teal::after   { background: #0d9488; }
+
+    .metric-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      margin-bottom: 14px;
+    }
+    .c-blue  .metric-icon { background: rgba(26,58,92,.1);  color: var(--primary); }
+    .c-accent.metric-card .metric-icon { background: rgba(232,148,58,.12); color: var(--accent); }
+    .c-green .metric-icon { background: rgba(22,163,74,.1);  color: var(--success); }
+    .c-warn  .metric-icon { background: rgba(217,119,6,.1);  color: var(--warning); }
+    .c-red   .metric-icon { background: rgba(220,38,38,.1);  color: var(--danger); }
+    .c-teal  .metric-icon { background: rgba(13,148,136,.1); color: #0d9488; }
+
+    .metric-value { font-family: var(--font-title); font-size: 28px; color: var(--primary); line-height: 1; margin-bottom: 2px; }
+    .metric-label { font-size: 12px; color: var(--text-m); margin-bottom: 10px; }
+    .metric-trend {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    }
+    .trend-up  { background: rgba(22,163,74,.1); color: var(--success); }
+    .trend-neu { background: var(--bg); color: var(--text-l); border: 1px solid var(--border); }
+
+    /* ── DATA CARD ── */
+    .data-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+    .data-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px solid var(--bg); }
+    .data-card-title { font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .data-card-title i { color: var(--accent); }
+
+    /* ── TABLE ── */
+    .tb-table { color: var(--text); font-size: 13px; margin: 0; }
+    .tb-table thead th { background: var(--bg); color: var(--text-m); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; border-bottom: 2px solid var(--border); padding: 9px 14px; }
+    .tb-table tbody td { border-bottom: 1px solid var(--bg); padding: 11px 14px; vertical-align: middle; }
+    .tb-table tbody tr:last-child td { border-bottom: none; }
+    .tb-table tbody tr:hover td { background: var(--bg); }
+
+    /* ── PILLS ── */
+    .pill { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    .pill-active     { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .pill-suspended  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .pill-pending    { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+    .pill-review     { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .pill-accepted   { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .pill-closed     { background: var(--bg); color: var(--text-l); border: 1px solid var(--border); }
+    .pill-rejected   { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .pill-candidate  { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+    .pill-employer   { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    .pill-admin      { background: rgba(232,148,58,.12); color: var(--warning); border: 1px solid rgba(232,148,58,.3); }
+    .pill-verified   { background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; }
+    .pill-unverified { background: var(--bg); color: var(--text-l); border: 1px solid var(--border); }
+    .pill-inactive   { background: var(--bg); color: var(--text-l); border: 1px solid var(--border); }
+
+    /* ── AVATARS ── */
+    .u-avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .uav-primary { background: linear-gradient(135deg, var(--primary), var(--primary-l)); }
+    .uav-accent  { background: linear-gradient(135deg, var(--accent), var(--accent-l)); }
+    .uav-green   { background: linear-gradient(135deg, #16a34a, #0d9488); }
+    .uav-teal    { background: linear-gradient(135deg, #0d9488, #2a5f9e); }
+
+    .company-logo-sm {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: rgba(26,58,92,.1);
+      border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800;
+      color: var(--primary);
+      flex-shrink: 0;
+      font-family: var(--font-body);
+    }
+
+    /* ── BUTTONS ── */
+    .tb-btn-primary {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 9px; padding: 7px 16px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .tb-btn-primary:hover { background: var(--accent-l); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(232,148,58,.35); }
+
+    .tb-btn-ghost {
+      background: transparent; color: var(--text-m);
+      border: 1.5px solid var(--border); border-radius: 9px;
+      padding: 6px 14px; font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .tb-btn-ghost:hover { border-color: var(--primary-l); color: var(--primary); }
+
+    .tb-btn-danger {
+      background: rgba(220,38,38,.08); color: var(--danger);
+      border: 1px solid rgba(220,38,38,.25); border-radius: 9px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .tb-btn-danger:hover { background: rgba(220,38,38,.15); }
+
+    .tb-btn-success {
+      background: rgba(22,163,74,.08); color: var(--success);
+      border: 1px solid rgba(22,163,74,.25); border-radius: 9px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .tb-btn-success:hover { background: rgba(22,163,74,.15); }
+
+    .btn-icon {
+      width: 30px; height: 30px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 7px; font-size: 13px; cursor: pointer;
+      transition: var(--transition); border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-m);
+    }
+    .btn-icon:hover        { background: var(--bg); color: var(--primary); border-color: var(--primary-l); }
+    .btn-icon.danger:hover { background: rgba(220,38,38,.08); color: var(--danger); border-color: rgba(220,38,38,.3); }
+    .btn-icon.success:hover{ background: rgba(22,163,74,.08); color: var(--success); border-color: rgba(22,163,74,.3); }
+
+    /* ── INPUT ── */
+    .tb-input {
+      border: 1.5px solid var(--border) !important; border-radius: 9px !important;
+      background: var(--bg) !important; color: var(--text) !important;
+      font-family: var(--font-body) !important; font-size: 13px !important;
+      padding: 8px 12px !important; transition: var(--transition) !important;
+    }
+    .tb-input:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(232,148,58,.15) !important; background: #fff !important; outline: none !important; }
+    .tb-input::placeholder { color: var(--text-l); }
+    .form-control.tb-input:focus { box-shadow: 0 0 0 3px rgba(232,148,58,.15); border-color: var(--accent) !important; }
+    .form-check-input:checked { background-color: var(--accent) !important; border-color: var(--accent) !important; }
+
+    /* ── BAR CHART ── */
+    .bar-chart-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .bar-chart-label { width: 130px; font-size: 12px; color: var(--text-m); text-align: right; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 3px; }
+    .bar-val   { width: 24px; font-size: 12px; color: var(--text-l); text-align: right; font-weight: 600; }
+
+    .progress-tb { height: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill-tb { height: 100%; border-radius: 3px; }
+
+    /* ── REPORT ITEM ── */
+    .report-item { background: #fff5f5; border: 1px solid #fecaca; border-radius: 9px; padding: 13px 15px; }
+    .report-item .report-type { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--danger); margin-bottom: 3px; }
+    .report-item p { font-size: 12px; color: var(--text-m); margin: 0 0 8px; }
+
+    /* ── COMPANY ROW ── */
+    .company-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--bg); }
+    .company-row:last-child { border-bottom: none; }
+    .stars { color: #f59e0b; font-size: 13px; }
+    .stars .empty { color: var(--border); }
+
+    /* ── ACTION BUTTONS ── */
+    .action-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 9px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      color: var(--text-m); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: var(--transition);
+      text-align: left; width: 100%; font-family: var(--font-body);
+    }
+    .action-btn:hover       { background: #fff; color: var(--primary); border-color: var(--primary-l); box-shadow: var(--shadow); }
+    .action-btn.danger:hover{ background: #fef2f2; color: var(--danger); border-color: rgba(220,38,38,.3); }
+    .action-btn i { font-size: 15px; }
+
+    /* ── SEARCH ── */
+    .search-wrap { position: relative; display: inline-block; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-l); font-size: 13px; pointer-events: none; }
+    .search-wrap input { padding-left: 32px !important; }
+
+    /* ── MOBILE ── */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(26,58,92,.5); z-index: 99; }
+    .sidebar-overlay.open { display: block; }
+    .sidebar-toggle { display: none; width: 36px; height: 36px; align-items: center; justify-content: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 9px; color: rgba(255,255,255,.8); cursor: pointer; font-size: 16px; }
+    @media (max-width: 991px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.open { transform: translateX(0); }
+      .admin-wrapper { margin-left: 0; }
+      .sidebar-toggle { display: flex !important; }
+      .admin-content { padding: 18px; }
+    }
+
+    /* ── TOAST ── */
+    .tb-toast { background: var(--primary); color: #fff; border: none; border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 260px; font-size: 13px; }
+    .tb-toast.success { background: var(--success); }
+    .tb-toast.error   { background: var(--danger); }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-logo">
+    <div class="brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M13 2L4.5 13.5H11.5L10 22L20.5 9.5H13.5L13 2Z" fill="#9ca3b0" stroke="#9ca3b0" stroke-width="0.5" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Principal</div>
+    <button class="nav-link-sb active" onclick="showSection('dashboard',this)"><i class="bi bi-grid-1x2-fill"></i>Dashboard</button>
+    <button class="nav-link-sb" onclick="showSection('usuarios',this)"><i class="bi bi-people-fill"></i>Usuarios</button>
+    <button class="nav-link-sb" onclick="showSection('empresas',this)"><i class="bi bi-building"></i>Empresas</button>
+    <button class="nav-link-sb" onclick="showSection('empleos',this)"><i class="bi bi-briefcase-fill"></i>Empleos</button>
+    <button class="nav-link-sb" onclick="showSection('postulaciones',this)"><i class="bi bi-send-fill"></i>Postulaciones</button>
+    <button class="nav-link-sb" onclick="showSection('valoraciones',this)"><i class="bi bi-star-fill"></i>Valoraciones</button>
+    <div class="sidebar-section-label">Sistema</div>
+    <button class="nav-link-sb" onclick="showSection('alertas',this)"><i class="bi bi-bell-fill"></i>Alertas<span class="badge-nav">3</span></button>
+    <button class="nav-link-sb" onclick="showSection('moderacion',this)"><i class="bi bi-shield-exclamation"></i>Moderación</button>
+    <button class="nav-link-sb" onclick="showSection('configuracion',this)"><i class="bi bi-gear-fill"></i>Configuración</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar-sb">SA</div>
+      <div><p class="u-name">Super Admin</p><p class="u-role">admin@conectasv.io</p></div>
+    </div>
+    <button class="nav-link-sb mt-1" onclick="confirmLogout()"><i class="bi bi-box-arrow-right"></i>Cerrar sesión</button>
+  </div>
+</aside>
+
+<div class="admin-wrapper">
+
+  <header class="admin-topbar">
+    <div class="d-flex align-items-center gap-3">
+      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-date"  id="topbarDate"></div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="topbar-badge-pending"><i class="bi bi-clock me-1"></i>3 pendientes</span>
+      <div class="topbar-icon-btn"><i class="bi bi-bell" style="font-size:14px"></i><span class="notif-dot"></span></div>
+      <div class="topbar-icon-btn" onclick="confirmLogout()"><i class="bi bi-box-arrow-right" style="font-size:14px"></i></div>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <section id="sec-dashboard">
+      <div class="section-title"><i class="bi bi-activity me-1"></i>Resumen General</div>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="metric-card c-blue"><div class="metric-icon"><i class="bi bi-people-fill"></i></div><div class="metric-value">3</div><div class="metric-label">Candidatos</div><span class="metric-trend trend-up"><i class="bi bi-arrow-up-short"></i>+1 esta semana</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-accent"><div class="metric-icon"><i class="bi bi-building"></i></div><div class="metric-value">2</div><div class="metric-label">Empleadores</div><span class="metric-trend trend-neu">Sin cambios</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-green"><div class="metric-icon"><i class="bi bi-briefcase-fill"></i></div><div class="metric-value">6</div><div class="metric-label">Empleos Activos</div><span class="metric-trend trend-up"><i class="bi bi-arrow-up-short"></i>+2 esta semana</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-warn"><div class="metric-icon"><i class="bi bi-send-fill"></i></div><div class="metric-value">4</div><div class="metric-label">Postulaciones</div><span class="metric-trend trend-up"><i class="bi bi-arrow-up-short"></i>+1 hoy</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-teal"><div class="metric-icon"><i class="bi bi-patch-check-fill"></i></div><div class="metric-value">3</div><div class="metric-label">Empresas Totales</div><span class="metric-trend trend-neu">2 verificadas</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-blue"><div class="metric-icon"><i class="bi bi-bookmark-fill"></i></div><div class="metric-value">4</div><div class="metric-label">Empleos Guardados</div><span class="metric-trend trend-neu">Por 3 usuarios</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-red"><div class="metric-icon"><i class="bi bi-bell-fill"></i></div><div class="metric-value">3</div><div class="metric-label">Alertas Activas</div><span class="metric-trend trend-neu">De 2 usuarios</span></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-accent"><div class="metric-icon"><i class="bi bi-star-fill"></i></div><div class="metric-value">2</div><div class="metric-label">Calificaciones</div><span class="metric-trend trend-up">Promedio ★ 4.5</span></div></div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+          <div class="data-card h-100">
+            <div class="data-card-header"><span class="data-card-title"><i class="bi bi-bar-chart-fill"></i>Empleos por Área</span></div>
+            <div class="bar-chart-row"><div class="bar-chart-label">Tecnología</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--primary)"></div></div><div class="bar-val">3</div></div>
+            <div class="bar-chart-row"><div class="bar-chart-label">Diseño</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--accent)"></div></div><div class="bar-val">1</div></div>
+            <div class="bar-chart-row"><div class="bar-chart-label">Marketing</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--warning)"></div></div><div class="bar-val">1</div></div>
+            <div class="bar-chart-row"><div class="bar-chart-label">Ventas</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:#0d9488"></div></div><div class="bar-val">1</div></div>
+            <div class="bar-chart-row"><div class="bar-chart-label">Finanzas</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--success)"></div></div><div class="bar-val">1</div></div>
+            <hr style="border-color:var(--border);margin:16px 0">
+            <div style="font-family:var(--font-body);font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px"><i class="bi bi-pie-chart-fill me-1" style="color:var(--accent)"></i>Tipos de Empleo</div>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="pill pill-review">Tiempo completo (3)</span>
+              <span class="pill pill-active">Remoto (2)</span>
+              <span class="pill pill-pending">Contrato (1)</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="data-card h-100">
+            <div class="data-card-header"><span class="data-card-title"><i class="bi bi-send"></i>Estado de Postulaciones</span></div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span style="font-size:13px;color:var(--text-m)">En revisión</span><span style="font-size:12px;color:var(--text-l);font-weight:600">1 / 4</span></div>
+              <div class="progress-tb"><div class="progress-fill-tb" style="width:25%;background:var(--primary-l)"></div></div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span style="font-size:13px;color:var(--text-m)">Pendiente</span><span style="font-size:12px;color:var(--text-l);font-weight:600">2 / 4</span></div>
+              <div class="progress-tb"><div class="progress-fill-tb" style="width:50%;background:var(--accent)"></div></div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span style="font-size:13px;color:var(--text-m)">Aceptada</span><span style="font-size:12px;color:var(--text-l);font-weight:600">1 / 4</span></div>
+              <div class="progress-tb"><div class="progress-fill-tb" style="width:25%;background:var(--success)"></div></div>
+            </div>
+            <hr style="border-color:var(--border);margin:16px 0">
+            <div style="font-family:var(--font-body);font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px"><i class="bi bi-star-fill me-1" style="color:var(--accent)"></i>Valoraciones de Empresas</div>
+            <div class="company-row">
+              <div class="d-flex align-items-center gap-2"><div class="company-logo-sm">TN</div><span style="font-size:13px;font-weight:600;color:var(--primary)">TechNova SV</span><span class="pill pill-verified" style="font-size:10px">verificada</span></div>
+              <span class="stars">★★★★★ <span style="color:var(--text-l);font-size:12px">5.0</span></span>
+            </div>
+            <div class="company-row">
+              <div class="d-flex align-items-center gap-2"><div class="company-logo-sm" style="color:var(--success);background:rgba(22,163,74,.1)">CH</div><span style="font-size:13px;font-weight:600;color:var(--primary)">CreativeHub</span><span class="pill pill-verified" style="font-size:10px">verificada</span></div>
+              <span class="stars">★★★★<span class="empty">★</span> <span style="color:var(--text-l);font-size:12px">4.0</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-card">
+        <div class="data-card-header"><span class="data-card-title"><i class="bi bi-clock-history"></i>Postulaciones Recientes</span><button class="tb-btn-ghost" onclick="showSection('postulaciones',null)">Ver todas</button></div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Candidato</th><th>Empleo</th><th>Empresa</th><th>Fecha</th><th>Estado</th></tr></thead>
+            <tbody>
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-usuarios" style="display:none">
+      <div class="data-card">
+        <div class="data-card-header">
+          <span class="data-card-title"><i class="bi bi-people-fill"></i>Gestión de Usuarios</span>
+          <div class="search-wrap"><i class="bi bi-search"></i><input type="text" class="form-control tb-input" style="width:220px" placeholder="Buscar usuario…" oninput="filterUsers(this.value)"></div>
+        </div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Ubicación</th><th>Vistas</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="usersTableBody">
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-empresas" style="display:none">
+      <div class="data-card">
+        <div class="data-card-header"><span class="data-card-title"><i class="bi bi-building"></i>Gestión de Empresas</span></div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Empresa</th><th>Industria</th><th>Tamaño</th><th>Sitio Web</th><th>Verificación</th><th>Acciones</th></tr></thead>
+            <tbody id="companiesTableBody">
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-empleos" style="display:none">
+      <div class="data-card">
+        <div class="data-card-header"><span class="data-card-title"><i class="bi bi-briefcase-fill"></i>Gestión de Empleos</span></div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Título</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Ubicación</th><th>Estado</th><th>Postulaciones</th></tr></thead>
+            <tbody id="jobsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-postulaciones" style="display:none">
+      <div class="data-card">
+        <div class="data-card-header"><span class="data-card-title"><i class="bi bi-send-fill"></i>Todas las Postulaciones</span></div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Candidato</th><th>Empleo</th><th>Empresa</th><th>Fecha</th><th>Estado</th></tr></thead>
+            <tbody id="appsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-valoraciones" style="display:none">
+      </section>
+
+  </main>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="toastEl" class="toast tb-toast align-items-center" role="alert">
+    <div class="d-flex align-items-center gap-2 p-3">
+      <i class="bi bi-check-circle-fill" id="toastIcon" style="font-size:16px"></i>
+      <span id="toastMsg" style="flex:1">Operación exitosa</span>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================================
+//  admin.html — Carga de datos reales desde la API
+// ============================================================
+
+const API = '';
+
+// ── Utilidades ───────────────────────────────────────────────
+function initials(str = '') {
+    return str.split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2);
+}
+function roleBadge(role) {
+    const map = { candidate:{ cls:'pill-review', label:'Candidato' }, employer:{ cls:'pill-pending', label:'Empleador' }, admin:{ cls:'pill-danger', label:'Admin' } };
+    const { cls, label } = map[role] || { cls:'pill-review', label:role };
+    return `<span class="pill ${cls}">${label}</span>`;
+}
+function statusBadge(s) { return s==='active' ? '<span class="pill pill-active">Activo</span>' : '<span class="pill pill-danger">Suspendido</span>'; }
+function verifiedBadge(v) { return v ? '<span class="pill pill-active">Verificada</span>' : '<span class="pill pill-pending">Pendiente</span>'; }
+function appStatusBadge(s) {
+    const m = { pending:{ cls:'pill-pending', l:'Pendiente' }, review:{ cls:'pill-review', l:'En revisión' }, interview:{ cls:'pill-active', l:'Entrevista' }, accepted:{ cls:'pill-active', l:'Aceptado' }, rejected:{ cls:'pill-danger', l:'Rechazado' } };
+    const { cls, l } = m[s] || { cls:'pill-review', l:s };
+    return `<span class="pill ${cls}">${l}</span>`;
+}
+function jobStatusBadge(s) {
+    const m = { active:{ cls:'pill-active', l:'Activa' }, paused:{ cls:'pill-pending', l:'Pausada' }, closed:{ cls:'pill-danger', l:'Cerrada' } };
+    const { cls, l } = m[s] || { cls:'pill-review', l:s };
+    return `<span class="pill ${cls}">${l}</span>`;
+}
+const typeLabels = { full:'Completo', part:'Parcial', remote:'Remoto', contract:'Contrato', freelance:'Freelance' };
+const levelLabels = { entry:'Entry', junior:'Junior', mid:'Mid', senior:'Senior' };
+
+// ── Navegación ───────────────────────────────────────────────
+const SECTION_TITLES = { dashboard:'Dashboard', usuarios:'Usuarios', empresas:'Empresas', empleos:'Empleos', postulaciones:'Postulaciones', valoraciones:'Valoraciones' };
+
+function showSection(id, el) {
+    document.querySelectorAll('section[id^="sec-"]').forEach(s => s.style.display = 'none');
+    const sec = document.getElementById('sec-' + id);
+    if (sec) sec.style.display = '';
+    document.querySelectorAll('.nav-link-sb').forEach(a => a.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const topTitle = document.querySelector('.topbar-title');
+    if (topTitle) topTitle.textContent = SECTION_TITLES[id] || id;
+    closeSidebar();
+    if (id === 'usuarios') loadUsers();
+    if (id === 'empresas') loadCompanies();
+    if (id === 'empleos') loadJobs();
+    if (id === 'postulaciones') loadApplications();
+}
+function toggleSidebar() {
+    document.getElementById('adminSidebar')?.classList.toggle('open');
+    document.getElementById('sidebarOverlay')?.classList.toggle('open');
+}
+function closeSidebar() {
+    document.getElementById('adminSidebar')?.classList.remove('open');
+    document.getElementById('sidebarOverlay')?.classList.remove('open');
+}
+
+// ── Usuarios ─────────────────────────────────────────────────
+async function loadUsers() {
+    try {
+        const users = await fetch(`${API}/api/users`).then(r => r.json());
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = users.map(u => {
+            const ini = initials(`${u.first_name} ${u.last_name}`);
+            const next = u.status === 'active' ? 'suspended' : 'active';
+            const btnLabel = u.status === 'active' ? 'Suspender' : 'Activar';
+            const btnCls = u.status === 'active' ? 'tb-btn-danger' : 'tb-btn-ghost';
+            return `<tr>
+              <td><div class="d-flex align-items-center gap-2"><div class="user-avatar-sm" style="width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0;">${ini}</div><span style="font-weight:600;color:var(--primary)">${u.first_name} ${u.last_name}</span></div></td>
+              <td style="color:var(--text-m)">${u.email}</td>
+              <td>${roleBadge(u.role)}</td>
+              <td style="color:var(--text-m)">${u.location || '—'}</td>
+              <td style="color:var(--text-m)">${u.profile_views ?? 0}</td>
+              <td>${statusBadge(u.status)}</td>
+              <td><button class="btn btn-sm ${btnCls}" style="font-size:12px;padding:4px 10px" onclick="toggleUserStatus(${u.id},'${next}')">${btnLabel}</button></td>
+            </tr>`;
+        }).join('');
+    } catch (err) { console.error('Error cargando usuarios:', err); }
+}
+async function toggleUserStatus(id, newStatus) {
+    try {
+        const res = await fetch(`${API}/api/users/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ status:newStatus, first_name:'', last_name:'', email:'', role:'', location:'', phone:'', bio:'' }) });
+        // Better: fetch user first, then update only status
+        const users = await fetch(`${API}/api/users`).then(r=>r.json());
+        const user = users.find(u=>u.id===id);
+        if (user) {
+            await fetch(`${API}/api/users/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...user, status:newStatus}) });
+        }
+        await loadUsers();
+        showToast(`Usuario ${newStatus==='active'?'activado':'suspendido'} correctamente`);
+    } catch (err) { showToast('Error al actualizar el usuario', true); }
+}
+
+function filterUsers(query) {
+    const rows = document.querySelectorAll('#usersTableBody tr');
+    const q = query.toLowerCase();
+    rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+}
+
+// ── Empresas ─────────────────────────────────────────────────
+async function loadCompanies() {
+    try {
+        const companies = await fetch(`${API}/api/companies`).then(r => r.json());
+        const tbody = document.getElementById('companiesTableBody');
+        tbody.innerHTML = companies.map(c => {
+            const ini = initials(c.name || '');
+            return `<tr>
+              <td><div class="d-flex align-items-center gap-2"><div class="company-logo-sm">${c.logo || ini}</div><span style="font-weight:600;color:var(--primary)">${c.name}</span></div></td>
+              <td style="color:var(--text-m)">${c.industry || '—'}</td>
+              <td style="color:var(--text-m)">${c.size || '—'}</td>
+              <td>${c.website ? `<a href="${c.website}" target="_blank" class="tb-link" style="font-size:13px">Ver sitio</a>` : '—'}</td>
+              <td>${verifiedBadge(c.verified)}</td>
+              <td><button class="btn btn-sm tb-btn-ghost" style="font-size:12px;padding:4px 10px" onclick="verifyCompany(${c.id})" ${c.verified ? 'disabled' : ''}>${c.verified ? 'Verificada' : 'Verificar'}</button></td>
+            </tr>`;
+        }).join('');
+    } catch (err) { console.error('Error cargando empresas:', err); }
+}
+async function verifyCompany(id) {
+    try {
+        // Fetch company, update verified field
+        const companies = await fetch(`${API}/api/companies`).then(r=>r.json());
+        const company = companies.find(c=>c.id===id);
+        if (company) {
+            await fetch(`${API}/api/companies/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...company, verified:true}) });
+        }
+        await loadCompanies();
+        showToast('Empresa verificada correctamente');
+    } catch (err) { showToast('Error al verificar la empresa', true); }
+}
+
+// ── Empleos ──────────────────────────────────────────────────
+async function loadJobs() {
+    try {
+        const jobs = await fetch(`${API}/api/jobs`).then(r => r.json());
+        const tbody = document.getElementById('jobsTableBody');
+        tbody.innerHTML = jobs.map(j => `<tr>
+          <td style="font-weight:600;color:var(--primary)">${j.title}</td>
+          <td><div class="d-flex align-items-center gap-2"><div class="company-logo-sm" style="width:24px;height:24px;font-size:9px">${j.company_logo || initials(j.company_name||'')}</div><span style="font-size:13px">${j.company_name || '—'}</span></div></td>
+          <td style="color:var(--text-m)">${typeLabels[j.type] || j.type}</td>
+          <td style="color:var(--text-m)">${levelLabels[j.level] || j.level}</td>
+          <td style="color:var(--text-m)">${j.location || '—'}</td>
+          <td>${jobStatusBadge(j.status)}</td>
+          <td style="font-weight:700;color:var(--primary)">${j.applications_count || 0}</td>
+        </tr>`).join('');
+    } catch (err) { console.error('Error cargando empleos:', err); }
+}
+
+// ── Postulaciones ────────────────────────────────────────────
+async function loadApplications() {
+    try {
+        const jobs = await fetch(`${API}/api/jobs`).then(r => r.json());
+        let allApps = [];
+        for (const j of jobs) {
+            const apps = await fetch(`${API}/api/applications/job/${j.id}`).then(r => r.json());
+            apps.forEach(a => allApps.push({ ...a, job_title: j.title, company_name: j.company_name }));
+        }
+        allApps.sort((a, b) => new Date(b.applied_at) - new Date(a.applied_at));
+        const tbody = document.getElementById('appsTableBody');
+        tbody.innerHTML = allApps.map(a => {
+            const ini = initials(`${a.first_name} ${a.last_name}`);
+            const date = new Date(a.applied_at).toLocaleDateString('es-SV',{day:'2-digit',month:'short',year:'numeric'});
+            return `<tr>
+              <td><div class="d-flex align-items-center gap-2"><div class="user-avatar-sm" style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700">${ini}</div><span style="font-weight:600">${a.first_name} ${a.last_name}</span></div></td>
+              <td style="color:var(--text-m)">${a.job_title}</td>
+              <td style="color:var(--text-m)">${a.company_name || '—'}</td>
+              <td style="color:var(--text-m)">${date}</td>
+              <td>${appStatusBadge(a.status)}</td>
+            </tr>`;
+        }).join('');
+        // Also update dashboard recent apps table
+        const dashTbody = document.querySelector('#sec-dashboard .data-card:last-child tbody');
+        if (dashTbody) dashTbody.innerHTML = allApps.slice(0,5).map(a => {
+            const ini = initials(`${a.first_name} ${a.last_name}`);
+            const date = new Date(a.applied_at).toLocaleDateString('es-SV',{day:'2-digit',month:'short'});
+            return `<tr>
+              <td><div class="d-flex align-items-center gap-2"><div class="user-avatar-sm" style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700">${ini}</div><span style="font-weight:600">${a.first_name} ${a.last_name}</span></div></td>
+              <td style="color:var(--text-m)">${a.job_title}</td>
+              <td style="color:var(--text-m)">${a.company_name || '—'}</td>
+              <td style="color:var(--text-m)">${date}</td>
+              <td>${appStatusBadge(a.status)}</td>
+            </tr>`;
+        }).join('') || '<tr><td colspan="5" class="text-center py-3" style="color:#888">Sin postulaciones</td></tr>';
+    } catch (err) { console.error('Error cargando postulaciones:', err); }
+}
+
+// ── Toast ────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+    const el = document.getElementById('toastEl');
+    const msgEl = document.getElementById('toastMsg');
+    const icon = document.getElementById('toastIcon');
+    msgEl.textContent = msg;
+    icon.className = isError ? 'bi bi-x-circle-fill' : 'bi bi-check-circle-fill';
+    el.style.background = isError ? 'var(--danger)' : 'var(--success)';
+    bootstrap.Toast.getOrCreateInstance(el).show();
+}
+
+function confirmLogout() {
+    if (confirm('¿Cerrar sesión?')) {
+        window.location.href = '/';
+    }
+}
+
+// ── Init ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadUsers();
+    loadCompanies();
+    loadApplications();
+});
+</script>
+<script src="/js/app.js"></script> </body>
+</body>
+</html>

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ConectaSV – Panel del Candidato</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary:#1a3a5c;--primary-l:#2a5f9e;--accent:#e8943a;--accent-l:#f0ac5e;
+      --bg:#f7f5f0;--surface:#fff;--border:#e2ddd6;
+      --text:#1c1917;--text-m:#6b6560;--text-l:#a09790;
+      --danger:#dc2626;--success:#16a34a;--warning:#d97706;
+      --radius:12px;--radius-lg:20px;
+      --shadow:0 2px 16px rgba(26,58,92,.10);--shadow-lg:0 8px 40px rgba(26,58,92,.16);
+      --transition:.2s cubic-bezier(.4,0,.2,1);
+      --font-title:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;
+      --sidebar-w:240px;--topbar-h:64px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px;line-height:1.6}
+    h1,h2,h3,h4,h5,h6{font-family:var(--font-title)}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    ::selection{background:rgba(232,148,58,.2);color:var(--primary)}
+
+    .admin-sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--primary);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;transition:transform var(--transition);box-shadow:4px 0 24px rgba(26,58,92,.18)}
+    .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
+    .brand-icon{width:36px;height:36px;background:#1e2d45;border-radius:10px;display:grid;place-items:center;flex-shrink:0;border:1px solid rgba(255,255,255,.08)}
+    .brand-text{font-family:var(--font-body);font-size:1.15rem;font-weight:300;letter-spacing:-.02em;color:#fff}
+    .brand-text strong{font-weight:700}.brand-sv{color:#4d9cf8;font-weight:800!important}
+    .sidebar-section-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:18px 20px 6px}
+    .nav-link-sb{display:flex;align-items:center;gap:10px;padding:9px 20px;color:rgba(255,255,255,.7);font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;cursor:pointer;transition:all var(--transition);border-radius:0}
+    .nav-link-sb:hover{background:rgba(255,255,255,.08);color:#fff}
+    .nav-link-sb.active{background:rgba(255,255,255,.12);color:#fff;font-weight:700;border-left:3px solid var(--accent)}
+    .nav-link-sb i{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+    .sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+    .user-avatar-sb{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}
+    .u-name{color:#fff;font-weight:600;font-size:13px;margin:0;line-height:1.2}.u-role{color:rgba(255,255,255,.5);font-size:11px;margin:0}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+
+    .admin-wrapper{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .admin-topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(26,58,92,.04)}
+    .topbar-title{font-family:var(--font-title);font-size:1.1rem;font-weight:400;color:var(--primary)}
+    .topbar-date{font-size:12px;color:var(--text-l);font-weight:400}
+    .topbar-actions{display:flex;align-items:center;gap:12px}
+    .topbar-user{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:rgba(26,58,92,.05);}
+    .topbar-user-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0;}
+    .topbar-user-meta{display:flex;flex-direction:column;line-height:1.1;}
+    .topbar-user-name{font-size:13px;font-weight:700;color:var(--primary);}
+    .topbar-user-email{font-size:11px;color:var(--text-m);}
+    .topbar-icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(26,58,92,.05);display:grid;place-items:center;cursor:pointer;transition:all var(--transition);border:none;color:var(--primary)}
+    .topbar-icon-btn:hover{background:rgba(26,58,92,.1)}
+    .sidebar-toggle{display:none;background:none;border:none;font-size:20px;color:var(--primary);cursor:pointer}
+    .admin-content{padding:24px;flex:1}
+
+    .section-title{font-family:var(--font-title);font-size:1.2rem;color:var(--primary);margin-bottom:20px;display:flex;align-items:center;gap:6px}
+    .metric-card{background:var(--surface);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform var(--transition)}
+    .metric-card:hover{transform:translateY(-2px)}
+    .metric-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:16px;margin-bottom:10px}
+    .c-blue .metric-icon{background:rgba(26,58,92,.08);color:var(--primary)}
+    .c-accent .metric-icon{background:rgba(232,148,58,.1);color:var(--accent)}
+    .c-green .metric-icon{background:rgba(22,163,74,.08);color:var(--success)}
+    .c-warn .metric-icon{background:rgba(217,119,6,.08);color:var(--warning)}
+    .c-red .metric-icon{background:rgba(220,38,38,.08);color:var(--danger)}
+    .metric-value{font-family:var(--font-title);font-size:1.8rem;color:var(--primary);line-height:1}
+    .metric-label{font-size:12px;color:var(--text-m);margin-top:4px}
+    .metric-trend{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;border-radius:6px;padding:2px 8px}
+    .trend-up{background:rgba(22,163,74,.1);color:var(--success)}.trend-neu{background:rgba(26,58,92,.06);color:var(--text-m)}
+
+    .data-card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+    .data-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .data-card-title{font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px}
+    .data-card-title i{color:var(--accent)}
+
+    .tb-table{font-size:13px}.tb-table thead th{color:var(--text-m);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);padding:10px 12px}
+    .tb-table tbody td{padding:10px 12px;vertical-align:middle;border-bottom:1px solid rgba(0,0,0,.04)}
+
+    .pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;border-radius:6px;padding:3px 10px;white-space:nowrap}
+    .pill-active{background:rgba(22,163,74,.1);color:var(--success)}
+    .pill-pending{background:rgba(232,148,58,.1);color:var(--accent)}
+    .pill-review{background:rgba(26,58,92,.08);color:var(--primary)}
+    .pill-danger{background:rgba(220,38,38,.08);color:var(--danger)}
+    .pill-paused{background:rgba(217,119,6,.08);color:var(--warning)}
+    .pill-closed{background:rgba(107,101,96,.1);color:var(--text-m)}
+    .pill-interview{background:rgba(168,85,247,.08);color:#7c3aed}
+    .pill-accepted{background:rgba(22,163,74,.1);color:var(--success)}
+    .pill-rejected{background:rgba(220,38,38,.08);color:var(--danger)}
+
+    .tb-label{font-size:12px;font-weight:600;color:var(--text-m);margin-bottom:6px;display:block}
+    .tb-input{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;padding:10px 14px;transition:all var(--transition)}
+    .tb-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,58,92,.08);background:var(--surface)}
+    .tb-select{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;padding:10px 14px}
+    .tb-btn-primary{background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:600;padding:10px 20px;transition:all var(--transition)}
+    .tb-btn-primary:hover{background:var(--primary-l);color:#fff;transform:translateY(-1px)}
+    .tb-btn-ghost{background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--primary);font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;transition:all var(--transition)}
+    .tb-btn-ghost:hover{background:rgba(26,58,92,.05);border-color:var(--primary)}
+    .tb-btn-danger{background:none;border:1px solid rgba(220,38,38,.2);border-radius:var(--radius);color:var(--danger);font-size:12px;font-weight:600;padding:4px 10px;cursor:pointer}
+    .tb-btn-danger:hover{background:rgba(220,38,38,.06)}
+    .tb-toast{border:none;border-radius:var(--radius);color:#fff;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg)}
+    .profile-photo-preview{width:100%;min-height:120px;border:1px solid var(--border);background:rgba(255,255,255,.95);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .profile-photo-preview img{width:auto;height:100%;max-width:100%;object-fit:cover;display:block}
+
+    .empty-state{text-align:center;padding:40px 20px;color:var(--text-m)}.empty-state i{font-size:2.5rem;opacity:.4;display:block;margin-bottom:10px}
+
+    .job-card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--border);transition:all var(--transition)}
+    .job-card:hover{border-color:var(--primary-l);box-shadow:0 4px 12px rgba(26,58,92,.08)}
+
+    @media(max-width:991px){
+      .admin-sidebar{transform:translateX(-100%)}
+      .admin-sidebar.open{transform:translateX(0)}
+      .sidebar-overlay.open{display:block}
+      .admin-wrapper{margin-left:0}
+      .sidebar-toggle{display:block}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-logo">
+    <div class="brand-icon"><i class="bi bi-briefcase-fill" style="color:#4d9cf8;font-size:18px"></i></div>
+    <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
+  </div>
+  <div class="sidebar-section-label">Mi cuenta</div>
+  <button class="nav-link-sb active" onclick="showSection('dashboard',this)"><i class="bi bi-house"></i>Inicio</button>
+  <button class="nav-link-sb" onclick="showSection('postulaciones',this)"><i class="bi bi-send-fill"></i>Mis Postulaciones</button>
+  <button class="nav-link-sb" onclick="showSection('guardados',this)"><i class="bi bi-bookmark-fill"></i>Empleos Guardados</button>
+  <button class="nav-link-sb" onclick="showSection('alertas',this)"><i class="bi bi-bell-fill"></i>Mis Alertas</button>
+  <div class="sidebar-section-label">Configuración</div>
+  <button class="nav-link-sb" onclick="showSection('perfil',this)"><i class="bi bi-person-gear"></i>Mi Perfil</button>
+  <div class="sidebar-footer">
+    <button class="nav-link-sb mt-1" onclick="confirmLogout()"><i class="bi bi-box-arrow-right"></i>Cerrar sesión</button>
+  </div>
+</aside>
+
+<div class="admin-wrapper">
+  <header class="admin-topbar">
+    <div class="d-flex align-items-center gap-3">
+      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-date" id="topbarDate"></div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="topbar-user" id="topbarUser">
+        <div class="topbar-user-avatar" id="topbarAvatar">CA</div>
+        <div class="topbar-user-meta">
+          <div class="topbar-user-name" id="topbarUserName">Candidato</div>
+          <div class="topbar-user-email" id="topbarUserEmail">user@test.com</div>
+        </div>
+      </div>
+      <span class="topbar-title" style="font-size:13px;font-weight:400;opacity:.6" id="topbarWelcome"></span>
+      <div class="topbar-icon-btn" onclick="confirmLogout()"><i class="bi bi-box-arrow-right" style="font-size:14px"></i></div>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <section id="sec-dashboard">
+      <div class="section-title"><i class="bi bi-briefcase-fill me-1"></i>Empleos Disponibles</div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="metric-card c-blue">
+            <div class="metric-icon"><i class="bi bi-person-badge"></i></div>
+            <div style="font-size:15px;font-weight:700;">Perfil completo</div>
+            <div style="font-size:13px;color:var(--text-m);margin-top:6px;">Actualiza tu perfil para mejorar tus oportunidades.</div>
+            <button class="tb-btn-primary mt-3" style="font-size:13px;padding:8px 14px;" onclick="goToProfile()">Completar perfil</button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="metric-card c-accent">
+            <div class="metric-icon"><i class="bi bi-search"></i></div>
+            <div style="font-size:15px;font-weight:700;">Buscar empleo</div>
+            <div style="font-size:13px;color:var(--text-m);margin-top:6px;">Filtra por ubicación, tipo y nivel para encontrar rápido.</div>
+            <button class="tb-btn-primary mt-3" style="font-size:13px;padding:8px 14px;" onclick="document.getElementById('searchInput').focus()">Filtrar empleos</button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="metric-card c-green">
+            <div class="metric-icon"><i class="bi bi-send-fill"></i></div>
+            <div style="font-size:15px;font-weight:700;">Revisar postulaciones</div>
+            <div style="font-size:13px;color:var(--text-m);margin-top:6px;">Controla tus postulaciones y su estado desde aquí.</div>
+            <button class="tb-btn-primary mt-3" style="font-size:13px;padding:8px 14px;" onclick="goToApplications()">Ver mis postulaciones</button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="metric-card c-warn">
+            <div class="metric-icon"><i class="bi bi-bookmark-fill"></i></div>
+            <div style="font-size:15px;font-weight:700;">Empleos guardados</div>
+            <div style="font-size:13px;color:var(--text-m);margin-top:6px;">Guarda tus vacantes favoritas y recuérdalas después.</div>
+            <button class="tb-btn-primary mt-3" style="font-size:13px;padding:8px 14px;" onclick="goToSaved()">Ver guardados</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros y búsqueda -->
+      <div class="data-card mb-4">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="tb-label">Buscar por título o empresa</label>
+            <input type="text" class="form-control tb-input" id="searchInput" placeholder="Ej: Desarrollador, Google..." oninput="filterJobs()">
+          </div>
+          <div class="col-md-3">
+            <label class="tb-label">Tipo de empleo</label>
+            <select class="form-control tb-select" id="typeFilter" onchange="filterJobs()">
+              <option value="">Todos los tipos</option>
+              <option value="full">Tiempo Completo</option>
+              <option value="part">Medio Tiempo</option>
+              <option value="remote">Remoto</option>
+              <option value="contract">Contrato</option>
+              <option value="freelance">Freelance</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="tb-label">Ubicación</label>
+            <input type="text" class="form-control tb-input" id="locationFilter" placeholder="Ej: San Salvador..." oninput="filterJobs()">
+          </div>
+          <div class="col-md-2">
+            <label class="tb-label">Nivel</label>
+            <select class="form-control tb-select" id="levelFilter" onchange="filterJobs()">
+              <option value="">Todos los niveles</option>
+              <option value="junior">Junior</option>
+              <option value="mid">Mid</option>
+              <option value="senior">Senior</option>
+              <option value="lead">Lead</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado de empleos -->
+      <div id="jobsContainer">
+        <div class="text-center py-4">
+          <i class="bi bi-arrow-clockwise" style="font-size:2rem;opacity:.3"></i>
+          <p class="mt-2" style="color:#888">Cargando empleos...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MIS POSTULACIONES ══════════ -->
+    <section id="sec-postulaciones" style="display:none">
+      <div class="section-title"><i class="bi bi-send-fill me-1"></i>Mis Postulaciones</div>
+      <div class="data-card">
+        <div class="data-card-header"><span class="data-card-title"><i class="bi bi-list-check"></i>Historial de Postulaciones</span></div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Empleo</th><th>Empresa</th><th>Tipo</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="allAppsBody"><tr><td colspan="6" class="text-center py-3" style="color:#888">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ EMPLEOS GUARDADOS ══════════ -->
+    <section id="sec-guardados" style="display:none">
+      <div class="section-title"><i class="bi bi-bookmark-fill me-1"></i>Empleos Guardados</div>
+      <div id="savedJobsList">
+        <div class="empty-state"><i class="bi bi-bookmark"></i><p>Aún no has guardado empleos.</p></div>
+      </div>
+    </section>
+
+    <!-- ══════════ ALERTAS ══════════ -->
+    <section id="sec-alertas" style="display:none">
+      <div class="section-title"><i class="bi bi-bell-fill me-1"></i>Mis Alertas de Empleo</div>
+      <div class="data-card">
+        <div class="data-card-header">
+          <span class="data-card-title"><i class="bi bi-bell"></i>Alertas Configuradas</span>
+          <button class="btn tb-btn-primary btn-sm" onclick="promptCreateAlert()">+ Nueva alerta</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table tb-table mb-0">
+            <thead><tr><th>Búsqueda</th><th>Estado</th><th>Creada</th><th>Acciones</th></tr></thead>
+            <tbody id="alertsBody"><tr><td colspan="4" class="text-center py-3" style="color:#888">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MI PERFIL ══════════ -->
+    <section id="sec-perfil" style="display:none">
+      <div class="section-title"><i class="bi bi-person-gear me-1"></i>Mi Perfil</div>
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="data-card">
+            <div class="data-card-header"><span class="data-card-title"><i class="bi bi-person"></i>Información Personal</span></div>
+            <div class="row g-3">
+              <div class="col-md-6"><label class="tb-label">Nombre</label><input type="text" class="form-control tb-input" id="profFirstName"/></div>
+              <div class="col-md-6"><label class="tb-label">Apellido</label><input type="text" class="form-control tb-input" id="profLastName"/></div>
+              <div class="col-md-6"><label class="tb-label">Correo Electrónico</label><input type="email" class="form-control tb-input" id="profEmail" readonly/></div>
+              <div class="col-md-6"><label class="tb-label">Teléfono</label><input type="text" class="form-control tb-input" id="profPhone"/></div>
+              <div class="col-12"><label class="tb-label">Foto de Perfil</label><input type="file" class="form-control tb-input" id="profPhotoFile" accept="image/*" onchange="previewFile()"/></div>
+              <div class="col-12">
+                <label class="tb-label">Vista previa</label>
+                <div class="profile-photo-preview"><img id="profPhotoPreview" src="" alt="Vista previa foto de perfil" style="display:none"/></div>
+              </div>
+              <div class="col-12"><label class="tb-label">Ubicación</label><input type="text" class="form-control tb-input" id="profLocation" placeholder="Ej: San Salvador, SV"/></div>
+              <div class="col-12"><label class="tb-label">Habilidades</label><input type="text" class="form-control tb-input" id="profSkills" placeholder='Separadas por coma: React, Node.js, PostgreSQL'/></div>
+              <div class="col-12"><label class="tb-label">Resumen Profesional</label><textarea class="form-control tb-input" id="profBio" rows="4" placeholder="Cuéntanos sobre ti..."></textarea></div>
+            </div>
+            <button class="btn tb-btn-primary mt-3" onclick="saveProfile()"><i class="bi bi-check-circle me-2"></i>Guardar Cambios</button>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="data-card">
+            <div class="data-card-header"><span class="data-card-title"><i class="bi bi-lightbulb"></i>Consejos</span></div>
+            <ul style="font-size:13px;color:var(--text-m);padding-left:18px;margin:0">
+              <li class="mb-2">Completa tu perfil para que las empresas te encuentren más fácil.</li>
+              <li class="mb-2">Agrega todas tus habilidades para mejorar tu visibilidad.</li>
+              <li class="mb-2">Un buen resumen profesional aumenta tus posibilidades.</li>
+              <li>Mantén tu teléfono actualizado para que te contacten.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="toastEl" class="toast tb-toast align-items-center" role="alert">
+    <div class="d-flex align-items-center gap-2 p-3">
+      <i class="bi bi-check-circle-fill" id="toastIcon" style="font-size:16px"></i>
+      <span id="toastMsg" style="flex:1">Operación exitosa</span>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================================
+//  candidate.html — Panel del Candidato / Postulante
+// ============================================================
+
+const API = '';
+let currentUser = null;
+
+// ── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const dateEl = document.getElementById('topbarDate');
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('es-SV', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    const stored = sessionStorage.getItem('candidateUser');
+    if (stored) {
+        currentUser = JSON.parse(stored);
+        setUserUI();
+        loadDashboard();
+    } else {
+        showToast('No hay sesión activa. Redirigiendo…', true);
+        setTimeout(() => { window.location.href = '/'; }, 1500);
+    }
+});
+
+function setUserUI() {
+    if (!currentUser) return;
+    const avatarEl = document.getElementById('topbarAvatar');
+    const ini = `${currentUser.first_name[0]}${currentUser.last_name[0]}`.toUpperCase();
+    if (currentUser.profile_photo_url) {
+        avatarEl.style.backgroundImage = `url("${currentUser.profile_photo_url}")`;
+        avatarEl.style.backgroundSize = 'cover';
+        avatarEl.style.backgroundPosition = 'center';
+        avatarEl.style.backgroundColor = 'transparent';
+        avatarEl.textContent = '';
+    } else {
+        avatarEl.style.backgroundImage = '';
+        avatarEl.style.backgroundColor = '';
+        avatarEl.textContent = ini;
+    }
+    document.getElementById('topbarUserName').textContent = `${currentUser.first_name} ${currentUser.last_name}`;
+    document.getElementById('topbarUserEmail').textContent = currentUser.email;
+    document.getElementById('topbarWelcome').textContent = `Hola, ${currentUser.first_name}`;
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────
+const TITLES = { dashboard:'Empleos Disponibles', postulaciones:'Mis Postulaciones', guardados:'Empleos Guardados', alertas:'Mis Alertas', perfil:'Mi Perfil' };
+
+function showSection(id, el) {
+    document.querySelectorAll('section[id^="sec-"]').forEach(s => s.style.display = 'none');
+    const sec = document.getElementById('sec-' + id);
+    if (sec) sec.style.display = '';
+    document.querySelectorAll('.nav-link-sb').forEach(a => a.classList.remove('active'));
+    if (el) el.classList.add('active');
+    document.getElementById('topbarTitle').textContent = TITLES[id] || id;
+    closeSidebar();
+
+    if (id === 'dashboard') loadDashboard();
+    if (id === 'postulaciones') loadAllApplications();
+    if (id === 'guardados') loadSavedJobs();
+    if (id === 'alertas') loadAlerts();
+    if (id === 'perfil') loadProfile();
+}
+
+function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
+function closeSidebar() { document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+
+function goToProfile() { showSection('perfil', document.querySelector("[onclick=\"showSection('perfil',this)\"]")); }
+function goToApplications() { showSection('postulaciones', document.querySelector("[onclick=\"showSection('postulaciones',this)\"]")); }
+function goToSaved() { showSection('guardados', document.querySelector("[onclick=\"showSection('guardados',this)\"]")); }
+function goToAlerts() { showSection('alertas', document.querySelector("[onclick=\"showSection('alertas',this)\"]")); }
+
+// ── DASHBOARD ────────────────────────────────────────────────
+let allJobs = [];
+
+async function loadDashboard() {
+    if (!currentUser) return;
+    try {
+        const res = await fetch(`${API}/api/jobs`);
+        allJobs = await res.json();
+        renderJobsList(allJobs);
+    } catch (err) {
+        console.error('Error cargando empleos:', err);
+        document.getElementById('jobsContainer').innerHTML = '<div class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle"></i><p>Error al cargar empleos</p></div>';
+    }
+}
+
+function filterJobs() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const type = document.getElementById('typeFilter').value;
+    const location = document.getElementById('locationFilter').value.toLowerCase();
+    const level = document.getElementById('levelFilter').value;
+
+    const filtered = allJobs.filter(job => {
+        const matchesSearch = !search || 
+            job.title.toLowerCase().includes(search) || 
+            (job.company_name && job.company_name.toLowerCase().includes(search));
+        const matchesType = !type || job.type === type;
+        const matchesLocation = !location || 
+            (job.location && job.location.toLowerCase().includes(location));
+        const matchesLevel = !level || job.level === level;
+        return matchesSearch && matchesType && matchesLocation && matchesLevel;
+    });
+
+    renderJobsList(filtered);
+}
+
+function renderJobsList(jobs) {
+    const container = document.getElementById('jobsContainer');
+    if (jobs.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i class="bi bi-search" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2" style="color:#888">No se encontraron empleos con esos criterios</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = jobs.map(job => buildJobCard(job)).join('');
+}
+
+function buildJobCard(job) {
+    const typeLabels = {
+        full: 'Tiempo Completo', part: 'Medio Tiempo',
+        remote: 'Remoto', contract: 'Contrato', freelance: 'Freelance'
+    };
+    const typeIcons = {
+        full: 'bi-clock-fill', part: 'bi-clock-history',
+        remote: 'bi-wifi', contract: 'bi-file-earmark-text', freelance: 'bi-lightning'
+    };
+    const salary = job.salary_min && job.salary_max
+        ? `$${Number(job.salary_min).toLocaleString()} – $${Number(job.salary_max).toLocaleString()}`
+        : job.salary_min ? `Desde $${Number(job.salary_min).toLocaleString()}`
+        : job.salary_max ? `Hasta $${Number(job.salary_max).toLocaleString()}`
+        : null;
+
+    const initials = (job.company_name || 'NN')
+        .split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2);
+
+    const daysAgo = Math.floor((Date.now() - new Date(job.created_at).getTime()) / 86400000);
+    const timeLabel = daysAgo === 0 ? 'Hoy' : daysAgo === 1 ? 'Ayer' : `Hace ${daysAgo} días`;
+
+    return `
+    <div class="job-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(26,58,92,.08);
+                     display:flex;align-items:center;justify-content:center;
+                     font-size:16px;font-weight:800;color:var(--accent,#e8943a)">${initials}</div>
+                <div>
+                    <h5 class="mb-1" style="font-weight:700;font-size:18px;color:var(--primary)">${job.title}</h5>
+                    <p class="mb-0" style="font-size:14px;color:var(--text-m)">${job.company_name || 'Empresa'}</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn tb-btn-ghost" onclick="saveJob(${job.id})" title="Guardar">
+                    <i class="bi bi-bookmark"></i>
+                </button>
+                <button class="btn tb-btn-primary" onclick="applyToJob(${job.id})">
+                    <i class="bi bi-send-fill me-1"></i>Postularme
+                </button>
+            </div>
+        </div>
+        
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge" style="background:rgba(26,58,92,.08);color:#1a3a5c;font-size:12px;font-weight:600">
+                <i class="bi ${typeIcons[job.type] || 'bi-briefcase'} me-1"></i>${typeLabels[job.type] || job.type}
+            </span>
+            ${job.location ? `<span class="badge" style="background:rgba(34,197,94,.08);color:#166534;font-size:12px;font-weight:600">
+                <i class="bi bi-geo-alt me-1"></i>${job.location}</span>` : ''}
+            ${job.level ? `<span class="badge" style="background:rgba(168,85,247,.08);color:#7c3aed;font-size:12px;font-weight:600">
+                <i class="bi bi-bar-chart me-1"></i>${job.level}</span>` : ''}
+        </div>
+        
+        ${salary ? `<p class="mb-2" style="font-size:16px;font-weight:700;color:var(--accent,#e8943a)">
+            <i class="bi bi-cash-stack me-1"></i>${salary}/mes</p>` : ''}
+        
+        <p class="mb-3" style="color:var(--text-m);font-size:14px">
+            ${job.description ? job.description.substring(0, 150) + (job.description.length > 150 ? '...' : '') : 'Sin descripción'}
+        </p>
+        
+        <div class="d-flex justify-content-between align-items-center">
+            <span style="font-size:12px;color:#888">
+                <i class="bi bi-clock me-1"></i>${timeLabel}
+            </span>
+            <button class="btn tb-btn-ghost" onclick="viewJobDetail(${job.id})">
+                Ver detalles <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>`;
+}
+
+async function applyToJob(jobId) {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión', true);
+        return;
+    }
+    
+    if (!confirm('¿Confirmas tu postulación a este empleo?')) return;
+    
+    try {
+        const res = await fetch(`${API}/api/applications`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                job_id: jobId,
+                candidate_id: currentUser.id,
+                cover_letter: 'Postulación desde dashboard'
+            })
+        });
+        
+        if (res.status === 409) {
+            showToast('Ya te postulaste a este empleo', true);
+            return;
+        }
+        
+        if (!res.ok) throw new Error('Error al postular');
+        
+        showToast('¡Postulación enviada exitosamente!');
+        // Opcional: actualizar métricas si las tuviéramos
+    } catch (err) {
+        console.error('Error:', err);
+        showToast('Error al enviar postulación', true);
+    }
+}
+
+async function saveJob(jobId) {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión', true);
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/api/saved-jobs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, job_id: jobId })
+        });
+
+        if (res.status === 409) {
+            showToast('Este empleo ya está guardado', true);
+            return;
+        }
+        if (!res.ok) throw new Error('Error al guardar');
+
+        showToast('Empleo guardado correctamente');
+        if (document.getElementById('sec-guardados').style.display !== 'none') {
+            loadSavedJobs();
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Error al guardar el empleo', true);
+    }
+}
+
+async function removeSavedJob(jobId) {
+    if (!currentUser) return;
+    if (!confirm('¿Eliminar este empleo guardado?')) return;
+
+    try {
+        const res = await fetch(`${API}/api/saved-jobs/${currentUser.id}/${jobId}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Error al eliminar');
+        showToast('Empleo removido de guardados');
+        loadSavedJobs();
+    } catch (err) {
+        console.error(err);
+        showToast('No se pudo eliminar el empleo guardado', true);
+    }
+}
+
+function viewJobDetail(jobId) {
+    const job = allJobs.find(j => j.id === jobId);
+    if (job) {
+        alert(`Detalles de ${job.title}\nEmpresa: ${job.company_name}\nDescripción: ${job.description}`);
+    }
+}
+
+async function promptCreateAlert() {
+    if (!currentUser) return;
+
+    const query = prompt('Describe la búsqueda para tu alerta de empleo (por ejemplo: Desarrollador backend remoto)');
+    if (!query || !query.trim()) return;
+
+    await createAlert(query.trim());
+}
+
+async function createAlert(query) {
+    try {
+        const res = await fetch(`${API}/api/alerts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, query, active: true })
+        });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => null);
+            showToast(errorData?.error || 'Error al crear la alerta', true);
+            return;
+        }
+        showToast('Alerta creada correctamente');
+        loadAlerts();
+    } catch (err) {
+        console.error(err);
+        showToast('Error al crear la alerta', true);
+    }
+}
+
+// ── MIS POSTULACIONES ────────────────────────────────────────
+async function loadAllApplications() {
+    if (!currentUser) return;
+    const tbody = document.getElementById('allAppsBody');
+    try {
+        const apps = await fetch(`${API}/api/applications/candidate/${currentUser.id}`).then(r => r.json());
+        if (apps.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-3" style="color:#888">No tienes postulaciones</td></tr>';
+            return;
+        }
+
+        const typeLabels = { full:'Completo', part:'Parcial', remote:'Remoto', contract:'Contrato', freelance:'Freelance' };
+
+        tbody.innerHTML = apps.sort((a,b) => new Date(b.applied_at)-new Date(a.applied_at)).map(a => {
+            const date = new Date(a.applied_at).toLocaleDateString('es-SV', { day:'2-digit', month:'short', year:'numeric' });
+            return `<tr>
+                <td style="font-weight:600;color:var(--primary)">${a.job_title || 'Empleo'}</td>
+                <td><div class="d-flex align-items-center gap-2"><div class="user-avatar-sb" style="width:24px;height:24px;font-size:9px;background:rgba(26,58,92,.08);color:var(--accent)">${(a.company_logo||initials(a.company_name||''))}</div><span style="font-size:13px">${a.company_name || '—'}</span></div></td>
+                <td style="color:var(--text-m)">${typeLabels[a.job_type] || a.job_type || '—'}</td>
+                <td style="color:var(--text-m)">${date}</td>
+                <td>${statusPill(a.status)}</td>
+                <td>
+                    ${a.status === 'pending' ? `<button class="btn btn-sm tb-btn-danger" onclick="withdrawApp(${a.id})"><i class="bi bi-x-circle me-1"></i>Retirar</button>` : '<span style="color:#aaa;font-size:12px">—</span>'}
+                </td>
+            </tr>`;
+        }).join('');
+    } catch(e) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar</td></tr>'; }
+}
+
+async function withdrawApp(appId) {
+    if (!confirm('¿Retirar esta postulación?')) return;
+    try {
+        await fetch(`${API}/api/applications/${appId}`, { method:'DELETE' });
+        showToast('Postulación retirada');
+        loadAllApplications();
+        loadDashboard();
+    } catch(e) { showToast('Error', true); }
+}
+
+// ── EMPLEOS GUARDADOS ────────────────────────────────────────
+async function loadSavedJobs() {
+    if (!currentUser) return;
+    const container = document.getElementById('savedJobsList');
+    try {
+        const res = await fetch(`${API}/api/saved-jobs/${currentUser.id}`);
+        if (!res.ok) {
+            container.innerHTML = '<div class="data-card"><div class="empty-state"><i class="bi bi-bookmark"></i><p>Hubo un problema al cargar tus empleos guardados.</p></div></div>';
+            return;
+        }
+        const saved = await res.json();
+        if (saved.length === 0) {
+            container.innerHTML = '<div class="data-card"><div class="empty-state"><i class="bi bi-bookmark"></i><p>No has guardado empleos aún. Usa el icono de guardar en la lista de empleos.</p></div></div>';
+            return;
+        }
+        container.innerHTML = saved.map(j => `
+            <div class="job-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h6 style="font-weight:700;margin:0 0 4px">${j.title}</h6>
+                        <span style="font-size:13px;color:var(--text-m)">${j.company_name || '—'} · ${j.location || '—'}</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm tb-btn-ghost" onclick="viewJobDetail(${j.job_id})"><i class="bi bi-eye me-1"></i>Ver</button>
+                        <button class="btn btn-sm tb-btn-danger" onclick="removeSavedJob(${j.job_id})"><i class="bi bi-x-circle me-1"></i>Eliminar</button>
+                    </div>
+                </div>
+                <p style="color:var(--text-m);font-size:13px;margin-bottom:0">${j.description ? j.description.substring(0, 120) + (j.description.length > 120 ? '...' : '') : 'Sin descripción disponible'}</p>
+            </div>`).join('');
+    } catch(e) {
+        console.error(e);
+        container.innerHTML = '<div class="data-card"><div class="empty-state"><i class="bi bi-bookmark"></i><p>Hubo un problema al cargar tus empleos guardados.</p></div></div>';
+    }
+}
+
+// ── ALERTAS ──────────────────────────────────────────────────
+async function loadAlerts() {
+    if (!currentUser) return;
+    const tbody = document.getElementById('alertsBody');
+    try {
+        const res = await fetch(`${API}/api/alerts/${currentUser.id}`);
+        if (!res.ok) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3" style="color:#888">Hubo un problema al cargar tus alertas.</td></tr>';
+            return;
+        }
+        const alerts = await res.json();
+        if (alerts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3" style="color:#888">No tienes alertas configuradas</td></tr>';
+            return;
+        }
+        tbody.innerHTML = alerts.map(a => {
+            const date = new Date(a.created_at).toLocaleDateString('es-SV', { day:'2-digit', month:'short', year:'numeric' });
+            return `<tr>
+                <td style="font-weight:600;color:var(--primary)">${a.query}</td>
+                <td>${a.active ? '<span class="pill pill-active">Activa</span>' : '<span class="pill pill-closed">Inactiva</span>'}</td>
+                <td style="color:var(--text-m)">${date}</td>
+                <td class="d-flex gap-2">
+                    <button class="btn btn-sm tb-btn-ghost" onclick="toggleAlert(${a.id}, ${!a.active})">${a.active ? 'Desactivar' : 'Activar'}</button>
+                    <button class="btn btn-sm tb-btn-danger" onclick="deleteAlert(${a.id})">Eliminar</button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch(e) {
+        console.error(e);
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3" style="color:#888">Hubo un problema al cargar tus alertas.</td></tr>';
+    }
+}
+
+async function toggleAlert(id, active) {
+    try {
+        const res = await fetch(`${API}/api/alerts/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active })
+        });
+        if (!res.ok) throw new Error('Error al actualizar');
+        showToast(`Alerta ${active ? 'activada' : 'desactivada'}`);
+        loadAlerts();
+    } catch(e) { console.error(e); showToast('Error', true); }
+}
+
+async function deleteAlert(id) {
+    if (!confirm('¿Eliminar esta alerta?')) return;
+    try {
+        const res = await fetch(`${API}/api/alerts/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Error al eliminar');
+        showToast('Alerta eliminada');
+        loadAlerts();
+    } catch(e) { console.error(e); showToast('Error al eliminar la alerta', true); }
+}
+
+// ── PERFIL ───────────────────────────────────────────────────
+async function loadProfile() {
+    if (!currentUser) return;
+    try {
+        const users = await fetch(`${API}/api/users`).then(r => r.json());
+        const u = users.find(x => x.id === currentUser.id);
+        if (!u) return;
+        document.getElementById('profFirstName').value = u.first_name || '';
+        document.getElementById('profLastName').value = u.last_name || '';
+        document.getElementById('profEmail').value = u.email || '';
+        document.getElementById('profPhone').value = u.phone || '';
+        updateProfilePhotoPreview(u.profile_photo_url);
+        document.getElementById('profLocation').value = u.location || '';
+        document.getElementById('profBio').value = u.bio || '';
+        currentUser.profile_photo_url = u.profile_photo_url || null;
+        sessionStorage.setItem('candidateUser', JSON.stringify(currentUser));
+        setUserUI();
+        // Skills: stored as JSON array
+        try {
+            const skills = u.skills ? JSON.parse(u.skills) : [];
+            document.getElementById('profSkills').value = skills.join(', ');
+        } catch(e) {
+            document.getElementById('profSkills').value = u.skills || '';
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function saveProfile() {
+    try {
+        // Parse skills to JSON
+        const skillsRaw = document.getElementById('profSkills').value;
+        const skillsArr = skillsRaw.split(',').map(s => s.trim()).filter(s => s);
+
+        const formData = new FormData();
+        formData.append('first_name', document.getElementById('profFirstName').value);
+        formData.append('last_name', document.getElementById('profLastName').value);
+        formData.append('email', currentUser.email);
+        formData.append('role', 'candidate');
+        formData.append('phone', document.getElementById('profPhone').value);
+        formData.append('location', document.getElementById('profLocation').value);
+        formData.append('bio', document.getElementById('profBio').value);
+        formData.append('status', 'active');
+        const file = document.getElementById('profPhotoFile').files[0];
+        if (file) {
+            formData.append('profile_photo', file);
+        }
+
+        const res = await fetch(`${API}/api/users/${currentUser.id}`, {
+            method: 'PUT',
+            body: formData
+        });
+        if (!res.ok) { showToast('Error al guardar', true); return; }
+        const updated = await res.json();
+        showToast('Perfil actualizado correctamente');
+        currentUser.first_name = document.getElementById('profFirstName').value;
+        currentUser.last_name = document.getElementById('profLastName').value;
+        currentUser.profile_photo_url = updated.usuario.profile_photo_url;
+        sessionStorage.setItem('candidateUser', JSON.stringify(currentUser));
+        setUserUI();
+        updateProfilePhotoPreview(currentUser.profile_photo_url);
+    } catch(e) { showToast('Error de conexión', true); }
+}
+
+function updateProfilePhotoPreview(url) {
+    const img = document.getElementById('profPhotoPreview');
+    if (!img) return;
+    if (url) {
+        img.src = url;
+        img.style.display = 'block';
+    } else {
+        img.src = '';
+        img.style.display = 'none';
+    }
+}
+
+function previewFile() {
+    const file = document.getElementById('profPhotoFile').files[0];
+    const img = document.getElementById('profPhotoPreview');
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        img.src = '';
+        img.style.display = 'none';
+    }
+}
+
+// ── UTILITIES ────────────────────────────────────────────────
+function initials(str) { return (str||'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2); }
+
+function statusPill(s) {
+    const m = {
+        pending: { cls:'pill-pending', l:'Pendiente' },
+        review: { cls:'pill-review', l:'En Revisión' },
+        interview: { cls:'pill-interview', l:'Entrevista' },
+        accepted: { cls:'pill-accepted', l:'Aceptado' },
+        rejected: { cls:'pill-rejected', l:'Rechazado' }
+    };
+    const { cls, l } = m[s] || { cls:'pill-review', l:s };
+    return `<span class="pill ${cls}">${l}</span>`;
+}
+
+function showToast(msg, isError = false) {
+    const el = document.getElementById('toastEl');
+    const msgEl = document.getElementById('toastMsg');
+    const icon = document.getElementById('toastIcon');
+    msgEl.textContent = msg;
+    icon.className = isError ? 'bi bi-x-circle-fill' : 'bi bi-check-circle-fill';
+    el.style.background = isError ? 'var(--danger)' : 'var(--success)';
+    bootstrap.Toast.getOrCreateInstance(el).show();
+}
+
+function confirmLogout() {
+    if (confirm('¿Cerrar sesión?')) {
+        sessionStorage.removeItem('candidateUser');
+        showToast('Sesión cerrada. Redirigiendo…');
+        setTimeout(() => { window.location.href = '/'; }, 1200);
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ConectaSV</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Google Fonts: DM Serif Display + DM Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="./css/styles.css"/>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVEGACIÓN PRINCIPAL (visible en todas las vistas)
+     Contiene: Logo, acceso rápido a secciones, login/registro
+     ============================================================ -->
+<nav class="tb-navbar navbar navbar-expand-lg" id="mainNavbar">
+  <div class="container-xl">
+    <!-- Logo ConectaSV -->
+    <a class="navbar-brand tb-brand" href="#" onclick="showView('home')">
+      <span class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2L4.5 13.5H11.5L10 22L20.5 9.5H13.5L13 2Z" fill="#9ca3b0" stroke="#9ca3b0" stroke-width="0.5" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <!-- Menú de navegación central -->
+      <ul class="navbar-nav me-auto ms-4 gap-1">
+        <li class="nav-item">
+          <a class="nav-link tb-nav-link" href="#" onclick="showView('home')">
+            <i class="bi bi-house me-1"></i>Inicio
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link tb-nav-link" href="#" onclick="showView('jobs')">
+            <i class="bi bi-search me-1"></i>Explorar Empleos
+          </a>
+        </li>
+        <li class="nav-item" id="navCandidate" style="display:none">
+          <a class="nav-link tb-nav-link" href="#" onclick="showView('candidate')">
+            <i class="bi bi-person-circle me-1"></i>Mi Perfil
+          </a>
+        </li>
+        <li class="nav-item" id="navEmployer" style="display:none">
+          <a class="nav-link tb-nav-link" href="#" onclick="showView('employer')">
+            <i class="bi bi-building me-1"></i>Panel Empresa
+          </a>
+        </li>
+        <li class="nav-item" id="navAdmin" style="display:none">
+          <a class="nav-link tb-nav-link" href="#" onclick="showView('admin')">
+            <i class="bi bi-shield-check me-1"></i>Admin
+          </a>
+        </li>
+      </ul>
+
+      <!-- Controles de sesión (cuando NO hay sesión activa) -->
+      <div class="d-flex align-items-center gap-2" id="authControls">
+        <button class="btn tb-btn-ghost" onclick="openModal('loginModal')">
+          <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar Sesión
+        </button>
+        <button class="btn tb-btn-primary" onclick="openModal('registerModal')">
+          <i class="bi bi-person-plus me-1"></i>Registrarse
+        </button>
+      </div>
+
+      <!-- Menú de usuario autenticado (oculto por defecto) -->
+      <div class="d-flex align-items-center gap-3" id="userControls" style="display:none">
+        <span class="tb-user-badge">
+          <span class="user-avatar" id="navAvatar"></span>
+          <span id="navUserName"></span>
+        </span>
+        <button class="btn tb-btn-ghost btn-sm" onclick="logout()">
+          <i class="bi bi-box-arrow-right me-1"></i>Salir
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     VISTA 1: PÁGINA DE INICIO (Pública)
+     Secciones: Hero, Buscador avanzado, Métricas, Empleos destacados
+     ============================================================ -->
+<div id="view-home" class="tb-view active">
+
+  <!-- Hero Section -->
+  <section class="tb-hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container-xl position-relative">
+      <div class="row align-items-center min-vh-70">
+        <div class="col-lg-7">
+          <div class="hero-badge mb-3">
+            <i class="bi bi-lightning-fill me-1"></i>
+            Más de 1,200 vacantes activas hoy
+          </div>
+          <h1 class="tb-hero-title">
+            Encuentra el trabajo<br/>
+            <em>que mereces</em>
+          </h1>
+          <p class="tb-hero-sub">
+            Conectamos talento con oportunidades reales. Más de 850 empresas confían en TalentoBridge para encontrar a sus próximos colaboradores.
+          </p>
+          <!-- Botones CTA principales -->
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <button class="btn tb-btn-primary btn-lg" onclick="showView('jobs')">
+              <i class="bi bi-search me-2"></i>Buscar Empleo
+            </button>
+            <button class="btn tb-btn-outline btn-lg" onclick="openModal('registerModal')">
+              <i class="bi bi-building me-2"></i>Publicar Vacante
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block">
+          <!-- Tarjeta flotante decorativa con estadísticas rápidas -->
+          <div class="hero-card-float">
+            <div class="floating-card card-1">
+              <i class="bi bi-check-circle-fill text-success"></i>
+              <span>Contratado en 14 días</span>
+            </div>
+            <div class="floating-card card-2">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span>4.9 / 5 satisfacción</span>
+            </div>
+            <div class="floating-card card-3">
+              <i class="bi bi-people-fill" style="color:var(--accent)"></i>
+              <span>+38,000 candidatos</span>
+            </div>
+            <div class="hero-central-icon">
+              <i class="bi bi-briefcase-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BUSCADOR AVANZADO ─────────────────────────────────── -->
+  <section class="tb-search-section">
+    <div class="container-xl">
+      <div class="tb-search-card">
+        <h2 class="tb-search-title">
+          <i class="bi bi-sliders me-2"></i>Búsqueda Avanzada
+        </h2>
+        <!-- Fila 1: Término + Ubicación -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-5">
+            <label class="tb-label">¿Qué estás buscando?</label>
+            <div class="input-group tb-input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control tb-input" id="searchTerm"
+                     placeholder="Título, empresa o habilidad…"/>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="tb-label">Ubicación</label>
+            <div class="input-group tb-input-group">
+              <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+              <input type="text" class="form-control tb-input" id="searchLocation"
+                     placeholder="Ciudad o país…"/>
+            </div>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <!-- Botón de búsqueda principal -->
+            <button class="btn tb-btn-primary w-100" onclick="performSearch()">
+              <i class="bi bi-search me-2"></i>Buscar
+            </button>
+          </div>
+        </div>
+        <!-- Fila 2: Filtros avanzados -->
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="tb-label">Tipo de Trabajo</label>
+            <select class="form-select tb-select" id="filterType">
+              <option value="">Todos los tipos</option>
+              <option value="full">Tiempo Completo</option>
+              <option value="part">Medio Tiempo</option>
+              <option value="remote">Remoto</option>
+              <option value="contract">Contrato</option>
+              <option value="freelance">Freelance</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="tb-label">Rango Salarial (USD/mes)</label>
+            <select class="form-select tb-select" id="filterSalary">
+              <option value="">Cualquier salario</option>
+              <option value="0-500">$0 – $500</option>
+              <option value="500-1000">$500 – $1,000</option>
+              <option value="1000-2000">$1,000 – $2,000</option>
+              <option value="2000-4000">$2,000 – $4,000</option>
+              <option value="4000+">$4,000+</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="tb-label">Nivel de Experiencia</label>
+            <select class="form-select tb-select" id="filterExp">
+              <option value="">Todos los niveles</option>
+              <option value="entry">Sin experiencia</option>
+              <option value="junior">Junior (1–2 años)</option>
+              <option value="mid">Mid (3–5 años)</option>
+              <option value="senior">Senior (5+ años)</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="tb-label">Área / Industria</label>
+            <select class="form-select tb-select" id="filterArea">
+              <option value="">Todas las áreas</option>
+              <option value="tech">Tecnología</option>
+              <option value="marketing">Marketing</option>
+              <option value="finance">Finanzas</option>
+              <option value="health">Salud</option>
+              <option value="education">Educación</option>
+              <option value="sales">Ventas</option>
+            </select>
+          </div>
+        </div>
+        <!-- Etiquetas de búsquedas populares -->
+        <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+          <span class="tb-tag-label">Populares:</span>
+          <button class="tb-chip" onclick="quickSearch('Desarrollador Web')">Desarrollador Web</button>
+          <button class="tb-chip" onclick="quickSearch('Diseñador UX')">Diseñador UX</button>
+          <button class="tb-chip" onclick="quickSearch('Analista de Datos')">Analista de Datos</button>
+          <button class="tb-chip" onclick="quickSearch('Marketing Digital')">Marketing Digital</button>
+          <button class="tb-chip" onclick="quickSearch('Contador')">Contador</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PANEL DE MÉTRICAS ─────────────────────────────────── -->
+  <section class="tb-metrics">
+    <div class="container-xl">
+      <div class="row g-4">
+        <!-- Cada tarjeta de métrica muestra un KPI animado -->
+        <div class="col-6 col-md-3">
+          <div class="tb-metric-card">
+            <div class="metric-icon" style="--mic:#4f8ef7">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="metric-value counter" data-target="852">0</div>
+            <div class="metric-label">Empresas Registradas</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="tb-metric-card">
+            <div class="metric-icon" style="--mic:#22c55e">
+              <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="metric-value counter" data-target="38420">0</div>
+            <div class="metric-label">Usuarios Activos</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="tb-metric-card">
+            <div class="metric-icon" style="--mic:#f59e0b">
+              <i class="bi bi-briefcase-fill"></i>
+            </div>
+            <div class="metric-value counter" data-target="1247">0</div>
+            <div class="metric-label">Empleos Publicados</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="tb-metric-card">
+            <div class="metric-icon" style="--mic:#a855f7">
+              <i class="bi bi-send-fill"></i>
+            </div>
+            <div class="metric-value counter" data-target="9831">0</div>
+            <div class="metric-label">Solicitudes Recibidas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EMPLEOS DESTACADOS ────────────────────────────────── -->
+  <section class="tb-featured py-5">
+    <div class="container-xl">
+      <div class="section-header">
+        <h2 class="tb-section-title">Empleos Destacados</h2>
+        <a href="#" class="tb-link-more" onclick="showView('jobs')">
+          Ver todos <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <!-- Las tarjetas se generan dinámicamente desde JS -->
+      <div class="row g-4" id="featuredJobs"></div>
+    </div>
+  </section>
+
+</div><!-- /view-home -->
+
+<!-- ============================================================
+     VISTA 2: EXPLORAR EMPLEOS (Listado con filtros)
+     ============================================================ -->
+<div id="view-jobs" class="tb-view">
+  <div class="tb-page-header">
+    <div class="container-xl">
+      <h1 class="tb-page-title">Explorar Empleos</h1>
+      <p class="tb-page-sub">Encuentra tu próxima oportunidad entre <span id="jobCount">0</span> vacantes disponibles.</p>
+    </div>
+  </div>
+  <div class="container-xl py-5">
+    <div class="row g-4">
+      <!-- Sidebar de filtros -->
+      <div class="col-lg-3">
+        <div class="tb-filter-sidebar">
+          <h6 class="tb-filter-title"><i class="bi bi-funnel me-2"></i>Filtrar Resultados</h6>
+          <div class="mb-3">
+            <label class="tb-label">Tipo</label>
+            <div class="tb-check-group">
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="ft1" value="full"><label class="form-check-label" for="ft1">Tiempo Completo</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="ft2" value="part"><label class="form-check-label" for="ft2">Medio Tiempo</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="ft3" value="remote"><label class="form-check-label" for="ft3">Remoto</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="ft4" value="contract"><label class="form-check-label" for="ft4">Contrato</label></div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Experiencia</label>
+            <div class="tb-check-group">
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="fe1" value="entry"><label class="form-check-label" for="fe1">Sin Experiencia</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="fe2" value="junior"><label class="form-check-label" for="fe2">Junior</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="fe3" value="mid"><label class="form-check-label" for="fe3">Mid-Level</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="fe4" value="senior"><label class="form-check-label" for="fe4">Senior</label></div>
+            </div>
+          </div>
+          <button class="btn tb-btn-primary w-100" onclick="applyFilters()">
+            <i class="bi bi-funnel-fill me-2"></i>Aplicar Filtros
+          </button>
+          <button class="btn tb-btn-ghost w-100 mt-2" onclick="clearFilters()">
+            <i class="bi bi-x-circle me-2"></i>Limpiar
+          </button>
+        </div>
+      </div>
+      <!-- Lista de empleos -->
+      <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <span class="tb-results-count" id="resultsCount"></span>
+          <select class="form-select tb-select" style="width:auto" id="sortJobs" onchange="sortJobs()">
+            <option value="recent">Más recientes</option>
+            <option value="salary">Mayor salario</option>
+            <option value="name">Nombre A–Z</option>
+          </select>
+        </div>
+        <div id="jobsList" class="d-flex flex-column gap-3"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-jobs -->
+
+<!-- ============================================================
+     VISTA 3: DETALLE DE EMPLEO
+     ============================================================ -->
+<div id="view-job-detail" class="tb-view">
+  <div class="container-xl py-5">
+    <button class="btn tb-btn-ghost mb-4" onclick="goBack()">
+      <i class="bi bi-arrow-left me-2"></i>Volver
+    </button>
+    <div class="row g-4">
+      <div class="col-lg-8" id="jobDetailMain"></div>
+      <div class="col-lg-4" id="jobDetailSide"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     VISTA 4: PERFIL DE CANDIDATO
+     ============================================================ -->
+<div id="view-candidate" class="tb-view">
+  <div class="tb-page-header">
+    <div class="container-xl">
+      <div class="d-flex align-items-center gap-4">
+        <div class="profile-avatar-lg" id="candidateAvatar"></div>
+        <div>
+          <h1 class="tb-page-title mb-1" id="candidateName"></h1>
+          <p class="tb-page-sub mb-0" id="candidateRole"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-xl py-5">
+    <div class="row g-4">
+      <!-- Panel izquierdo: Formulario de datos personales -->
+      <div class="col-lg-4">
+        <div class="tb-card">
+          <h5 class="tb-card-title"><i class="bi bi-person-fill me-2"></i>Datos Personales</h5>
+          <div class="mb-3">
+            <label class="tb-label">Nombre Completo</label>
+            <input type="text" class="form-control tb-input" id="profileName" value=""/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Correo Electrónico</label>
+            <input type="email" class="form-control tb-input" id="profileEmail" value=""/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Teléfono</label>
+            <input type="tel" class="form-control tb-input" id="profilePhone" value=""/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Ubicación</label>
+            <input type="text" class="form-control tb-input" id="profileLocation" value=""/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Cargo / Área</label>
+            <input type="text" class="form-control tb-input" id="profileRole" value=""/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Resumen Profesional</label>
+            <textarea class="form-control tb-input" rows="3" id="profileBio"></textarea>
+          </div>
+          <!-- Carga de CV: acepta PDF y DOCX -->
+          <div class="mb-3">
+            <label class="tb-label">Currículum (PDF / DOCX)</label>
+            <div class="tb-upload-zone" id="cvUploadZone" onclick="document.getElementById('cvFile').click()">
+              <i class="bi bi-cloud-arrow-up-fill"></i>
+              <span id="cvFileName">Arrastra o haz clic para subir</span>
+            </div>
+            <!-- Input oculto; el accept restringe los formatos permitidos -->
+            <input type="file" id="cvFile" accept=".pdf,.docx" style="display:none" onchange="handleCVUpload(event)"/>
+          </div>
+          <button class="btn tb-btn-primary w-100" onclick="saveProfile()">
+            <i class="bi bi-floppy me-2"></i>Guardar Cambios
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel central: Estadísticas + Habilidades -->
+      <div class="col-lg-5">
+        <!-- Estadísticas del candidato -->
+        <div class="tb-card mb-4">
+          <h5 class="tb-card-title"><i class="bi bi-bar-chart-fill me-2"></i>Mis Estadísticas</h5>
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="stat-mini">
+                <div class="stat-mini-val" id="statVisits">128</div>
+                <div class="stat-mini-label">Visitas al Perfil</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-mini">
+                <div class="stat-mini-val" id="statApps">7</div>
+                <div class="stat-mini-label">Solicitudes Enviadas</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-mini">
+                <div class="stat-mini-val text-success">3</div>
+                <div class="stat-mini-label">Entrevistas</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-mini">
+                <div class="stat-mini-val text-warning">4</div>
+                <div class="stat-mini-label">Guardados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Habilidades técnicas -->
+        <div class="tb-card mb-4">
+          <h5 class="tb-card-title"><i class="bi bi-lightning-fill me-2"></i>Habilidades</h5>
+          <div class="d-flex flex-wrap gap-2" id="skillsList">
+            <span class="tb-skill-tag">HTML5</span>
+            <span class="tb-skill-tag">CSS3</span>
+            <span class="tb-skill-tag">JavaScript</span>
+            <span class="tb-skill-tag">React</span>
+            <span class="tb-skill-tag">Bootstrap</span>
+            <span class="tb-skill-tag">Git</span>
+          </div>
+          <div class="mt-3 d-flex gap-2">
+            <input type="text" class="form-control tb-input" id="newSkill" placeholder="Nueva habilidad…"/>
+            <button class="btn tb-btn-primary" onclick="addSkill()"><i class="bi bi-plus"></i></button>
+          </div>
+        </div>
+
+        <!-- Valoraciones de empresas -->
+        <div class="tb-card">
+          <h5 class="tb-card-title"><i class="bi bi-star-fill me-2"></i>Valorar Empresa</h5>
+          <p class="tb-text-muted small">Comparte tu experiencia laboral para ayudar a la comunidad.</p>
+          <div class="mb-3">
+            <label class="tb-label">Empresa</label>
+            <input type="text" class="form-control tb-input" id="rateCompany" placeholder="Nombre de la empresa…"/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Puntuación</label>
+            <div class="tb-star-rating" id="starRating">
+              <!-- Las estrellas se renderizan con JS -->
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Comentario</label>
+            <textarea class="form-control tb-input" rows="2" id="rateComment" placeholder="Describe tu experiencia…"></textarea>
+          </div>
+          <button class="btn tb-btn-primary w-100" onclick="submitRating()">
+            <i class="bi bi-send me-2"></i>Enviar Valoración
+          </button>
+          <!-- Historial de valoraciones enviadas -->
+          <div id="ratingHistory" class="mt-3"></div>
+        </div>
+      </div>
+
+      <!-- Panel derecho: Alertas y notificaciones -->
+      <div class="col-lg-3">
+        <div class="tb-card mb-4">
+          <h5 class="tb-card-title"><i class="bi bi-bell-fill me-2"></i>Alertas de Empleo</h5>
+          <p class="tb-text-muted small">Recibe notificaciones de nuevas ofertas según tus preferencias.</p>
+          <div id="alertsList" class="d-flex flex-column gap-2">
+            <!-- Alertas generadas por JS -->
+          </div>
+          <button class="btn tb-btn-outline w-100 mt-3" onclick="addAlert()">
+            <i class="bi bi-plus me-2"></i>Nueva Alerta
+          </button>
+        </div>
+
+        <!-- Ofertas guardadas -->
+        <div class="tb-card">
+          <h5 class="tb-card-title"><i class="bi bi-bookmark-fill me-2"></i>Guardados</h5>
+          <div id="savedJobsList" class="d-flex flex-column gap-2">
+            <!-- Se rellenan desde JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-candidate -->
+
+     VISTA 5: MÓDULO EMPRESARIAL (EMPLEADOR)
+     ============================================================ -->
+<div id="view-employer" class="tb-view">
+  <div class="tb-page-header">
+    <div class="container-xl">
+      <h1 class="tb-page-title">Panel de Empresa</h1>
+      <p class="tb-page-sub">Gestiona tus vacantes y revisa postulaciones.</p>
+    </div>
+  </div>
+  <div class="container-xl py-5">
+    <div class="row g-4">
+      <!-- Formulario de publicación de vacante -->
+      <div class="col-lg-5">
+        <div class="tb-card">
+          <h5 class="tb-card-title"><i class="bi bi-plus-circle-fill me-2"></i>Publicar Nueva Vacante</h5>
+          <div class="mb-3">
+            <label class="tb-label">Título del Puesto *</label>
+            <input type="text" class="form-control tb-input" id="jobTitle" placeholder="Ej: Desarrollador Full-Stack"/>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="tb-label">Tipo</label>
+              <select class="form-select tb-select" id="jobType">
+                <option value="full">Tiempo Completo</option>
+                <option value="part">Medio Tiempo</option>
+                <option value="remote">Remoto</option>
+                <option value="contract">Contrato</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="tb-label">Nivel</label>
+              <select class="form-select tb-select" id="jobLevel">
+                <option value="entry">Sin experiencia</option>
+                <option value="junior">Junior</option>
+                <option value="mid">Mid-Level</option>
+                <option value="senior">Senior</option>
+              </select>
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="tb-label">Salario Mínimo (USD)</label>
+              <input type="number" class="form-control tb-input" id="jobSalaryMin" placeholder="1000"/>
+            </div>
+            <div class="col-6">
+              <label class="tb-label">Salario Máximo (USD)</label>
+              <input type="number" class="form-control tb-input" id="jobSalaryMax" placeholder="2000"/>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Ubicación</label>
+            <input type="text" class="form-control tb-input" id="jobLocation" placeholder="Ciudad, País o 'Remoto'"/>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Requisitos</label>
+            <textarea class="form-control tb-input" rows="3" id="jobRequirements"
+              placeholder="Lista las habilidades y experiencia requeridas…"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Descripción del Puesto *</label>
+            <textarea class="form-control tb-input" rows="4" id="jobDescription"
+              placeholder="Describe las responsabilidades, beneficios y cultura de la empresa…"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="tb-label">Correo de Contacto *</label>
+            <input type="email" class="form-control tb-input" id="jobContact" placeholder="rh@empresa.com"/>
+          </div>
+          <!-- Valida campos obligatorios antes de publicar -->
+          <button class="btn tb-btn-primary w-100" onclick="publishJob()">
+            <i class="bi bi-send-fill me-2"></i>Publicar Vacante
+          </button>
+        </div>
+      </div>
+
+      <!-- Gestión de candidatos y vacantes publicadas -->
+      <div class="col-lg-7">
+        <div class="tb-card mb-4">
+          <h5 class="tb-card-title"><i class="bi bi-briefcase me-2"></i>Mis Vacantes Publicadas</h5>
+          <div id="employerJobsList" class="d-flex flex-column gap-3"></div>
+        </div>
+
+        <!-- Tabla de postulantes por vacante seleccionada -->
+        <div class="tb-card" id="candidateTableCard" style="display:none">
+          <h5 class="tb-card-title">
+            <i class="bi bi-people me-2"></i>Postulantes para:
+            <span id="selectedJobTitle" class="text-accent"></span>
+          </h5>
+          <div class="table-responsive">
+            <table class="table tb-table">
+              <thead>
+                <tr>
+                  <th>Candidato</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="candidatesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-employer -->
+
+
+
+----------------------------------------------------------------------------------
+<div id="view-admin" class="tb-view">
+  <div class="tb-page-header">
+    <div class="container-xl">
+      <div class="d-flex align-items-center gap-3">
+        <div class="admin-badge"><i class="bi bi-shield-fill-check"></i></div>
+        <div>
+          <h1 class="tb-page-title mb-0">Panel Administrativo</h1>
+          <p class="tb-page-sub mb-0">Control total del sistema · Acceso restringido</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-xl py-5">
+
+    <!-- KPIs del sistema -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-3">
+        <div class="tb-admin-stat">
+          <i class="bi bi-people-fill"></i>
+          <div class="as-value" id="adminUsers">38,420</div>
+          <div class="as-label">Total Usuarios</div>
+          <div class="as-badge badge bg-success">+12% este mes</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="tb-admin-stat">
+          <i class="bi bi-building"></i>
+          <div class="as-value" id="adminCompanies">852</div>
+          <div class="as-label">Empresas</div>
+          <div class="as-badge badge bg-info">+5 pendientes</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="tb-admin-stat">
+          <i class="bi bi-briefcase-fill"></i>
+          <div class="as-value" id="adminJobs">1,247</div>
+          <div class="as-label">Vacantes Activas</div>
+          <div class="as-badge badge bg-warning text-dark">8 en revisión</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="tb-admin-stat">
+          <i class="bi bi-flag-fill"></i>
+          <div class="as-value text-danger" id="adminReports">14</div>
+          <div class="as-label">Reportes</div>
+          <div class="as-badge badge bg-danger">Requieren atención</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Gestión de usuarios -->
+      <div class="col-lg-8">
+        <div class="tb-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="tb-card-title mb-0"><i class="bi bi-people me-2"></i>Gestión de Usuarios</h5>
+            <input type="text" class="form-control tb-input" style="width:220px"
+                   placeholder="Buscar usuario…" oninput="filterAdminUsers(this.value)"/>
+          </div>
+          <div class="table-responsive">
+            <table class="table tb-table">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moderación de contenido -->
+      <div class="col-lg-4">
+        <div class="tb-card mb-4">
+          <h5 class="tb-card-title"><i class="bi bi-shield-exclamation me-2"></i>Contenido Reportado</h5>
+          <div id="reportedContent" class="d-flex flex-column gap-2"></div>
+        </div>
+
+        <!-- Acciones rápidas del sistema -->
+        <div class="tb-card">
+          <h5 class="tb-card-title"><i class="bi bi-gear-fill me-2"></i>Acciones del Sistema</h5>
+          <div class="d-flex flex-column gap-2">
+            <button class="btn tb-btn-outline w-100" onclick="adminAction('backup')">
+              <i class="bi bi-cloud-download me-2"></i>Exportar Respaldo
+            </button>
+            <button class="btn tb-btn-outline w-100" onclick="adminAction('notify')">
+              <i class="bi bi-megaphone me-2"></i>Enviar Notificación Global
+            </button>
+            <button class="btn tb-btn-outline w-100" onclick="adminAction('maintenance')">
+              <i class="bi bi-tools me-2"></i>Modo Mantenimiento
+            </button>
+            <button class="btn tb-btn-danger w-100" onclick="adminAction('purge')">
+              <i class="bi bi-trash3 me-2"></i>Limpiar Caché
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-admin -->
+
+<!-- ============================================================
+     MODAL: INICIAR SESIÓN
+     Validación de campos vacíos y roles de usuario
+     ============================================================ -->
+<div class="modal fade tb-modal" id="loginModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header tb-modal-header">
+        <h5 class="modal-title"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-4">
+
+        <div class="mb-3">
+          <label class="tb-label">Correo Electrónico</label>
+          <input type="email" class="form-control tb-input" id="loginEmail"
+                 placeholder="correo@ejemplo.com"/>
+        </div>
+
+        <div class="mb-3">
+          <label class="tb-label">Contraseña</label>
+          <div class="input-group tb-input-group">
+            <input type="password" class="form-control tb-input" id="loginPassword"
+                   placeholder="••••••••"/>
+            <button class="input-group-text tb-eye-btn" type="button"
+                    onclick="togglePassword('loginPassword', this)">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="rememberMe">
+            <label class="form-check-label small" for="rememberMe">Recordarme</label>
+          </div>
+          <a href="#" class="tb-link small">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Mensaje de error — visible solo cuando login() encuentra un problema -->
+        <div id="loginError"
+             style="display:none; color:var(--danger); font-size:13px;
+                    margin-bottom:12px; padding:10px 12px;
+                    background:rgba(220,38,38,.08); border-radius:8px;
+                    border:1px solid rgba(220,38,38,.2);">
+        </div>
+
+        <button class="btn tb-btn-primary w-100" onclick="login()">
+          Iniciar Sesión
+        </button>
+
+        <hr class="my-3"/>
+        <p class="text-center small mb-0 tb-text-muted">
+          ¿No tienes cuenta?
+          <a href="#" class="tb-link"
+             onclick="switchModal('loginModal','registerModal')">Regístrate gratis</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: REGISTRO
+     ============================================================ -->
+<div class="modal fade tb-modal" id="registerModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header tb-modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Crear Cuenta</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="tb-role-selector mb-4">
+          <p class="tb-label mb-2">Tipo de cuenta:</p>
+          <div class="d-flex gap-2">
+            <button class="tb-role-btn active" data-role="candidate" onclick="selectRole('candidate', this, 'reg')">
+              <i class="bi bi-person-fill"></i><span>Candidato</span>
+            </button>
+            <button class="tb-role-btn" data-role="employer" onclick="selectRole('employer', this, 'reg')">
+              <i class="bi bi-building"></i><span>Empresa</span>
+            </button>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="tb-label">Nombre</label>
+            <input type="text" class="form-control tb-input" id="regFirst" placeholder="Juan"/>
+          </div>
+          <div class="col-6">
+            <label class="tb-label">Apellido</label>
+            <input type="text" class="form-control tb-input" id="regLast" placeholder="Díaz"/>
+          </div>
+          <div class="col-12">
+            <label class="tb-label">Correo Electrónico</label>
+            <input type="email" class="form-control tb-input" id="regEmail" placeholder="correo@ejemplo.com"/>
+          </div>
+          <div class="col-12">
+            <label class="tb-label">Contraseña</label>
+            <div class="input-group tb-input-group">
+              <input type="password" class="form-control tb-input" id="regPassword" placeholder="Mínimo 8 caracteres"/>
+              <button class="input-group-text tb-eye-btn" type="button" onclick="togglePassword('regPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <!-- Indicador visual de fortaleza de contraseña -->
+            <div class="password-strength mt-2" id="pwStrength">
+              <div class="pw-bar"><div id="pwBar"></div></div>
+              <span id="pwLabel" class="small tb-text-muted"></span>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="tb-label">Confirmar Contraseña</label>
+            <input type="password" class="form-control tb-input" id="regConfirm" placeholder="Repite tu contraseña"/>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="acceptTerms"/>
+              <label class="form-check-label small" for="acceptTerms">
+                Acepto los <a href="#" class="tb-link">Términos y Condiciones</a>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button class="btn tb-btn-primary w-100 mt-4" onclick="register()">
+          <i class="bi bi-person-check me-2"></i>Crear mi Cuenta
+        </button>
+        <p class="text-center small mt-3 mb-0 tb-text-muted">
+          ¿Ya tienes cuenta?
+          <a href="#" class="tb-link" onclick="switchModal('registerModal','loginModal')">Inicia sesión</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade tb-modal" id="candidateDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header tb-modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-circle me-2"></i>Perfil del Candidato</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="candidateDetailBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de notificaciones -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="toastNotif" class="toast tb-toast align-items-center" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMsg">Operación exitosa</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="tb-footer">
+  <div class="container-xl">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="tb-brand mb-3">
+          <span class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 2L4.5 13.5H11.5L10 22L20.5 9.5H13.5L13 2Z" fill="#9ca3b0" stroke="#9ca3b0" stroke-width="0.5" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
+        </div>
+        <p class="tb-text-muted small">Conectando talento con oportunidades en El Salvador. Tu próxima oportunidad está a un clic.</p>
+      </div>
+      <div class="col-md-2">
+        <h6 class="tb-footer-heading">Plataforma</h6>
+        <ul class="tb-footer-links">
+          <li><a href="#" onclick="showView('jobs')">Explorar Empleos</a></li>
+          <li><a href="#" onclick="openModal('registerModal')">Registrarse</a></li>
+          <li><a href="#" onclick="openModal('loginModal')">Iniciar Sesión</a></li>
+        </ul>
+      </div>
+      <div class="col-md-2">
+        <h6 class="tb-footer-heading">Empresa</h6>
+        <ul class="tb-footer-links">
+          <li><a href="#">Sobre Nosotros</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="tb-footer-heading">Newsletter</h6>
+        <p class="tb-text-muted small">Recibe las mejores oportunidades en tu correo.</p>
+        <div class="input-group tb-input-group">
+          <input type="email" class="form-control tb-input" placeholder="correo@ejemplo.com"/>
+          <button class="btn tb-btn-primary" type="button">Suscribir</button>
+        </div>
+      </div>
+    </div>
+    <hr class="tb-footer-divider"/>
+    <div class="d-flex flex-wrap justify-content-between align-items-center">
+      <p class="small tb-text-muted mb-0">© 2024 TalentoBridge. Todos los derechos reservados.</p>
+      <div class="d-flex gap-3">
+        <a href="#" class="tb-social"><i class="bi bi-linkedin"></i></a>
+        <a href="#" class="tb-social"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" class="tb-social"><i class="bi bi-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./js/indexApp.js"></script>
+<script src="./js/jobsApp.js"></script>
+<script src="./js/employerApp.js"></script>
+</body>
+</html>
