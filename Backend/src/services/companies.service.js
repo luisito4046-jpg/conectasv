@@ -1,4 +1,4 @@
-import { pool } from '../db.js';
+import { pool } from '../config/db.js';
 
 export const findAllCompanies = async () => {
     const result = await pool.query('SELECT * FROM companies');
