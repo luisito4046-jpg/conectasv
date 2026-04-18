@@ -44,7 +44,7 @@ export const getBuscarNombre = async (req, res) => {
 // CREAR UN NUEVO USUARIO
 export const postCrearUsuario = async (req, res) => {
     try {
-        const { first_name, last_name, email, password_hash, role, location, phone } = req.body;
+        const { first_name, last_name, email, password_hash, role, location, phone, profile_photo_url } = req.body;
 
         // Si viene password_hash sin hashear (texto plano del frontend), hashear con bcrypt
         const bcrypt = (await import('bcrypt')).default;
@@ -55,9 +55,9 @@ export const postCrearUsuario = async (req, res) => {
 
         const query = `
             INSERT INTO users 
-                (first_name, last_name, email, password_hash, role, location, phone)
+                (first_name, last_name, email, password_hash, role, location, phone, profile_photo_url)
             VALUES 
-                ($1, $2, $3, $4, $5, $6, $7) 
+                ($1, $2, $3, $4, $5, $6, $7, $8) 
             RETURNING *;`;
 
         const result = await pool.query(query, [
@@ -67,7 +67,8 @@ export const postCrearUsuario = async (req, res) => {
             finalHash,
             role || 'candidate', 
             location, 
-            phone
+            phone,
+            profile_photo_url || null
         ]);
 
         res.status(201).json(result.rows[0]);
@@ -82,19 +83,14 @@ export const actualizarUsuario = async (req, res) => {
         const { id_usuario } = req.params;
         const { first_name, last_name, email, role, location, phone, bio, status, profile_photo_url } = req.body;
         
-        let photoUrl = profile_photo_url;
-        if (req.file) {
-            photoUrl = `/uploads/${req.file.filename}`;
-        }
-        
         const query = `
             UPDATE users
             SET first_name=$1, last_name=$2, email=$3, role=$4, location=$5, 
-                phone=$6, bio=$7, status=$8, profile_photo_url=$9, updated_at=CURRENT_TIMESTAMP
+                phone=$6, bio=$7, profile_photo_url=$8, status=$9, updated_at=CURRENT_TIMESTAMP
             WHERE id=$10
             RETURNING *;`;
 
-        const values = [first_name, last_name, email, role, location, phone, bio, status, photoUrl, id_usuario];
+        const values = [first_name, last_name, email, role, location, phone, bio, profile_photo_url || null, status, id_usuario];
         const result = await pool.query(query, values);
 
         if (result.rowCount === 0) {
