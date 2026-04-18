@@ -1,0 +1,27 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Desktop.ini
+ehthumbs.db
+
+# Environment
+.env
+.env.local
+
+# Node modules (if any in root)
+node_modules/
+
+# Build outputs
+dist/
+build/
