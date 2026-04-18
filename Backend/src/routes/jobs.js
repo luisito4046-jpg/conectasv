@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
     getAllJobs, getJobById, getJobsByEmployer,
-    createJob, updateJob, deleteJob
-} from '../controllers/jobsServices.js';
+    createJob, updateJobHandler, deleteJobHandler
+} from '../controllers/jobs.controller.js';
 
 const router = Router();
 
@@ -19,9 +19,9 @@ router.get('/employer/:employerId', getJobsByEmployer);
 router.post('/', createJob);
 
 // PUT /api/jobs/:id — actualizar empleo
-router.put('/:id', updateJob);
+router.put('/:id', updateJobHandler);
 
 // DELETE /api/jobs/:id — eliminar empleo
-router.delete('/:id', deleteJob);
+router.delete('/:id', deleteJobHandler);
 
 export default router;

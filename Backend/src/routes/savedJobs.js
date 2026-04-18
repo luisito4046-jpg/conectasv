@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getSavedJobsByUser, createSavedJob, deleteSavedJob } from '../controllers/savedJobsServices.js';
+import { getSavedJobsByUser, createSavedJob, deleteSavedJob } from '../controllers/savedJobs.controller.js';
 
 const router = Router();
 

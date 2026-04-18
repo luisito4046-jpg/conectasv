@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { actualizarUsuario, eliminarUsuario, getAllUsers, getBuscarNombre, getUserByEmail, postCrearUsuario } from '../controllers/usersServices.js';
+import { actualizarUsuario, eliminarUsuario, getAllUsers, getBuscarNombre, getUserByEmail, postCrearUsuario } from '../controllers/users.controller.js';
 
 const router = Router();
 

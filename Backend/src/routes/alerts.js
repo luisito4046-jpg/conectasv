@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAlertsByUser, createAlert, updateAlert, deleteAlert } from '../controllers/alertsServices.js';
+import { getAlertsByUser, createAlert, updateAlert, deleteAlert } from '../controllers/alerts.controller.js';
 
 const router = Router();
 

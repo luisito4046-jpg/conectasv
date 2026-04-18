@@ -7,7 +7,7 @@ import {
     postCrearEmpresa,
     actualizarEmpresa,
     eliminarEmpresa
-} from '../controllers/companiesServices.js';
+} from '../controllers/companies.controller.js';
 
 const router = Router();
 
