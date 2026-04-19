@@ -40,14 +40,33 @@ export const insertUser = async ({ first_name, last_name, email, password_hash, 
     return result.rows[0];
 };
 
-export const updateUser = async (id, { first_name, last_name, email, role, location, phone, bio, profile_photo_url, status }) => {
+export const updateUser = async (id, data) => {
+    const fields = [
+        'first_name', 'last_name', 'email', 'role',
+        'location', 'phone', 'bio', 'profile_photo_url',
+        'skills', 'cv_url', 'status'
+    ];
+
+    const updates = [];
+    const values  = [];
+    let   index   = 1;
+
+    for (const field of fields) {
+        if (data[field] !== undefined && data[field] !== '') {
+            updates.push(`${field} = $${index}`);
+            values.push(data[field]);
+            index++;
+        }
+    }
+
+    if (updates.length === 0) return null;
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
     const result = await pool.query(
-        `UPDATE users
-         SET first_name=$1, last_name=$2, email=$3, role=$4, location=$5,
-             phone=$6, bio=$7, profile_photo_url=$8, status=$9, updated_at=CURRENT_TIMESTAMP
-         WHERE id=$10
-         RETURNING *`,
-        [first_name, last_name, email, role, location, phone, bio, profile_photo_url ?? null, status, id]
+        `UPDATE users SET ${updates.join(', ')} WHERE id = $${index} RETURNING *`,
+        values
     );
     return result.rows[0] ?? null;
 };

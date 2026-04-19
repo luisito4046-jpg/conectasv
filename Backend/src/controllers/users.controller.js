@@ -7,6 +7,7 @@ import {
     updateUser,
     deleteUser,
 } from '../services/users.service.js';
+import { uploadToCloudinary } from '../middleware/upload.js';// ← solo este
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -53,10 +54,23 @@ export const postCrearUsuario = async (req, res) => {
 
 export const actualizarUsuario = async (req, res) => {
     try {
-        const user = await updateUser(req.params.id_usuario, req.body);
+        console.log('BODY:', req.body);
+        console.log('FILE:', req.file);
+        console.log('ID:', req.params.id_usuario);
+
+        const userData = { ...req.body };
+
+        if (req.file) {
+            const publicId = `user_${req.params.id_usuario}_${Date.now()}`;
+            const result   = await uploadToCloudinary(req.file.buffer, publicId); // ← buffer
+            userData.profile_photo_url = result.secure_url;
+        }
+
+        const user = await updateUser(req.params.id_usuario, userData);
         if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
         res.status(200).json({ message: 'Usuario actualizado correctamente', usuario: user });
     } catch (err) {
+        console.error('ERROR actualizarUsuario:', err);
         res.status(500).json({ error: err.message });
     }
 };
