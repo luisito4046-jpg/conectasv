@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recursos Profesionales – ConectaSV</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/styles.css"/>
+  <style>
+    :root {
+      --primary:#1a3a5c;--primary-l:#2a5f9e;--accent:#e8943a;--accent-l:#f0ac5e;
+      --bg:#f7f5f0;--surface:#fff;--border:#e2ddd6;
+      --text:#1c1917;--text-m:#6b6560;--text-l:#a09790;
+      --danger:#dc2626;--success:#16a34a;--warning:#d97706;
+      --radius:12px;--radius-lg:20px;
+      --shadow:0 2px 16px rgba(26,58,92,.10);--shadow-lg:0 8px 40px rgba(26,58,92,.16);
+      --transition:.2s cubic-bezier(.4,0,.2,1);
+      --font-title:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+    h1,h2,h3,h4,h5,h6{font-family:var(--font-title)}
+
+    /* ── NAVBAR (igual al index) ── */
+    .tb-navbar{background:var(--primary);padding:12px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,58,92,.18)}
+    .tb-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .brand-icon{width:36px;height:36px;background:#1e2d45;border-radius:10px;display:grid;place-items:center;flex-shrink:0;border:1px solid rgba(255,255,255,.08)}
+    .brand-text{font-family:var(--font-body);font-size:1.1rem;font-weight:300;color:#fff;letter-spacing:-.02em}
+    .brand-text strong{font-weight:700}.brand-sv{color:#4d9cf8;font-weight:800!important}
+    .tb-nav-link{color:rgba(255,255,255,.75)!important;font-size:13px;font-weight:500;border-radius:8px;padding:7px 12px!important;transition:all var(--transition)}
+    .tb-nav-link:hover,.tb-nav-link.active{color:#fff!important;background:rgba(255,255,255,.1)}
+    .tb-btn-ghost{border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;font-size:13px;font-weight:600;padding:8px 16px;transition:all var(--transition);background:transparent}
+    .tb-btn-ghost:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.4)}
+    .tb-btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;padding:8px 18px;transition:all var(--transition)}
+    .tb-btn-primary:hover{background:var(--accent-l);transform:translateY(-1px)}
+    .navbar-toggler{border-color:rgba(255,255,255,.3)}.navbar-toggler-icon{filter:invert(1)}
+
+    /* ── HERO de la página ── */
+    .res-hero{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-l) 100%);padding:64px 0 56px;position:relative;overflow:hidden}
+    .res-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+    .res-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,.85);font-weight:600;margin-bottom:18px}
+    .res-hero h1{font-family:var(--font-title);font-size:2.6rem;color:#fff;line-height:1.2;margin-bottom:14px}
+    .res-hero h1 em{color:var(--accent-l);font-style:italic}
+    .res-hero p{color:rgba(255,255,255,.75);font-size:16px;max-width:520px;margin-bottom:28px}
+    .res-search-bar{display:flex;gap:0;max-width:480px;border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+    .res-search-bar input{flex:1;border:none;padding:13px 18px;font-size:14px;outline:none;font-family:var(--font-body)}
+    .res-search-bar button{background:var(--accent);border:none;padding:13px 22px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:background var(--transition);white-space:nowrap}
+    .res-search-bar button:hover{background:var(--accent-l)}
+    .res-stats{display:flex;gap:32px;margin-top:36px;flex-wrap:wrap}
+    .res-stat{text-align:center}.res-stat-val{font-family:var(--font-title);font-size:1.6rem;color:#fff;line-height:1}
+    .res-stat-lbl{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+
+    /* ── TABS de categorías ── */
+    .res-tabs-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:50}
+    .res-tabs{display:flex;gap:4px;padding:0 0;overflow-x:auto;scrollbar-width:none}
+    .res-tabs::-webkit-scrollbar{display:none}
+    .res-tab{display:flex;align-items:center;gap:7px;padding:16px 20px;font-size:13px;font-weight:600;color:var(--text-m);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all var(--transition)}
+    .res-tab:hover{color:var(--primary)}
+    .res-tab.active{color:var(--primary);border-bottom-color:var(--accent)}
+    .res-tab i{font-size:15px}
+
+    /* ── LAYOUT PRINCIPAL ── */
+    .res-layout{display:grid;grid-template-columns:260px 1fr;gap:28px;padding:32px 0 60px;align-items:start}
+    @media(max-width:991px){.res-layout{grid-template-columns:1fr}}
+
+    /* ── SIDEBAR FILTROS ── */
+    .res-sidebar{position:sticky;top:110px}
+    .res-sidebar-card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+    .res-sidebar-title{font-family:var(--font-body);font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+    .res-filter-btn{display:flex;align-items:center;gap:9px;width:100%;border:none;background:none;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text-m);cursor:pointer;transition:all var(--transition);text-align:left}
+    .res-filter-btn:hover{background:rgba(26,58,92,.05);color:var(--primary)}
+    .res-filter-btn.active{background:rgba(26,58,92,.08);color:var(--primary);font-weight:700}
+    .res-filter-btn .badge-count{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 7px}
+
+    /* ── TARJETAS DE RECURSOS ── */
+    .res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+    .res-card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;transition:all var(--transition);border:1px solid transparent;display:flex;flex-direction:column}
+    .res-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:rgba(26,58,92,.08)}
+    .res-card-thumb{height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+    .res-card-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,.08))}
+    .thumb-blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe)}
+    .thumb-orange{background:linear-gradient(135deg,#ffedd5,#fed7aa)}
+    .thumb-green{background:linear-gradient(135deg,#dcfce7,#bbf7d0)}
+    .thumb-purple{background:linear-gradient(135deg,#f3e8ff,#e9d5ff)}
+    .thumb-yellow{background:linear-gradient(135deg,#fef9c3,#fef08a)}
+    .thumb-red{background:linear-gradient(135deg,#fee2e2,#fecaca)}
+    .res-card-body{padding:18px;flex:1;display:flex;flex-direction:column}
+    .res-card-cat{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;width:fit-content}
+    .cat-career{background:rgba(26,58,92,.08);color:var(--primary)}
+    .cat-tutorial{background:rgba(232,148,58,.1);color:var(--accent)}
+    .cat-news{background:rgba(22,163,74,.08);color:var(--success)}
+    .cat-cv{background:rgba(168,85,247,.08);color:#7c3aed}
+    .cat-interview{background:rgba(59,130,246,.08);color:#2563eb}
+    .cat-skills{background:rgba(217,119,6,.08);color:var(--warning)}
+    .res-card-title{font-family:var(--font-title);font-size:1rem;color:var(--primary);margin-bottom:8px;line-height:1.3}
+    .res-card-desc{font-size:13px;color:var(--text-m);line-height:1.6;flex:1}
+    .res-card-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .res-card-meta{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-l)}
+    .res-card-meta i{font-size:12px}
+    .res-card-action{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--primary);text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:5px 12px;transition:all var(--transition)}
+    .res-card-action:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+    /* ── SECCIÓN DESTACADA (CTA) ── */
+    .res-cta{background:linear-gradient(135deg,var(--primary),var(--primary-l));border-radius:var(--radius-lg);padding:40px;color:#fff;margin-bottom:28px;position:relative;overflow:hidden}
+    .res-cta::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+    .res-cta h3{font-family:var(--font-title);font-size:1.5rem;margin-bottom:10px}
+    .res-cta p{color:rgba(255,255,255,.75);font-size:14px;margin-bottom:20px;max-width:400px}
+    .res-cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+
+    /* ── SECCIÓN BANNER (plantillas) ── */
+    .res-banner{background:linear-gradient(135deg,#fdf6ee,#fff3e0);border:1px solid #f5ddb5;border-radius:var(--radius-lg);padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:28px}
+    .res-banner-icon{width:56px;height:56px;border-radius:14px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+    .res-banner h4{font-family:var(--font-title);font-size:1.15rem;color:var(--primary);margin-bottom:4px}
+    .res-banner p{font-size:13px;color:var(--text-m);margin:0}
+    @media(max-width:576px){.res-banner{flex-direction:column;text-align:center}}
+
+    /* ── NEWSLETTER ── */
+    .res-newsletter{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px;text-align:center}
+    .res-newsletter h5{font-family:var(--font-title);font-size:1.1rem;color:var(--primary);margin-bottom:8px}
+    .res-newsletter p{font-size:13px;color:var(--text-m);margin-bottom:16px}
+    .res-nl-form{display:flex;gap:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+    .res-nl-form input{flex:1;border:none;padding:11px 14px;font-size:13px;outline:none;font-family:var(--font-body);background:var(--bg)}
+    .res-nl-form button{background:var(--primary);border:none;padding:11px 18px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:background var(--transition)}
+    .res-nl-form button:hover{background:var(--primary-l)}
+
+    /* ── FOOTER ── */
+    .tb-footer{background:var(--primary);color:rgba(255,255,255,.7);padding:50px 0 24px}
+    .tb-footer-heading{font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:14px}
+    .tb-footer-links{list-style:none;padding:0;margin:0}
+    .tb-footer-links li{margin-bottom:8px}
+    .tb-footer-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;transition:color var(--transition)}
+    .tb-footer-links a:hover{color:#fff}
+    .tb-footer-divider{border-color:rgba(255,255,255,.08);margin:24px 0 16px}
+    .tb-social{color:rgba(255,255,255,.5);font-size:16px;transition:color var(--transition);text-decoration:none}
+    .tb-social:hover{color:#fff}
+    .tb-text-muted{color:rgba(255,255,255,.5)}
+
+    /* ── EMPTY STATE ── */
+    .res-empty{text-align:center;padding:60px 20px;color:var(--text-l)}
+    .res-empty i{font-size:3rem;opacity:.3;display:block;margin-bottom:12px}
+
+    /* ── PILL DE TIPO DE CONTENIDO ── */
+    .content-type-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:700}
+    .type-article{background:rgba(59,130,246,.08);color:#2563eb}
+    .type-video{background:rgba(239,68,68,.08);color:#dc2626}
+    .type-pdf{background:rgba(22,163,74,.08);color:var(--success)}
+    .type-guide{background:rgba(168,85,247,.08);color:#7c3aed}
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ──────────────────────────────────────────────── -->
+<nav class="tb-navbar navbar navbar-expand-lg">
+  <div class="container-xl">
+    <a class="navbar-brand tb-brand" href="../index.html">
+      <span class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M13 2L4.5 13.5H11.5L10 22L20.5 9.5H13.5L13 2Z" fill="#9ca3b0" stroke="#9ca3b0" stroke-width="0.5" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto ms-4 gap-1">
+        <li class="nav-item"><a class="nav-link tb-nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Inicio</a></li>
+        <li class="nav-item"><a class="nav-link tb-nav-link" href="../index.html#jobs"><i class="bi bi-search me-1"></i>Explorar Empleos</a></li>
+        <li class="nav-item"><a class="nav-link tb-nav-link" href="../index.html#forum"><i class="bi bi-chat-dots me-1"></i>Foro</a></li>
+        <li class="nav-item"><a class="nav-link tb-nav-link active" href="recursos.html"><i class="bi bi-journal-bookmark me-1"></i>Recursos</a></li>
+      </ul>
+      <!-- Sin sesión activa -->
+      <div class="d-flex align-items-center gap-2" id="authControls">
+        <button class="btn tb-btn-ghost" onclick="window.location.href='../index.html'">
+          <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar Sesión
+        </button>
+        <button class="btn tb-btn-primary" onclick="window.location.href='../index.html'">
+          <i class="bi bi-person-plus me-1"></i>Registrarse
+        </button>
+      </div>
+
+      <!-- Con sesión activa (oculto por defecto) -->
+      <div class="d-flex align-items-center gap-3" id="userControls" style="display:none!important">
+        <a href="#" id="navProfileLink" class="text-decoration-none d-flex align-items-center gap-2" style="cursor:pointer" title="Ver mi perfil">
+          <span id="navAvatar"
+                style="width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;
+                       display:inline-flex;align-items:center;justify-content:center;
+                       font-weight:700;font-size:14px;overflow:hidden;flex-shrink:0;"></span>
+          <span id="navUserName" style="color:#fff;font-size:13px;font-weight:600;"></span>
+        </a>
+        <button class="btn tb-btn-ghost btn-sm" onclick="logoutRecursos()">
+          <i class="bi bi-box-arrow-right me-1"></i>Salir
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ────────────────────────────────────────────────── -->
+<section class="res-hero">
+  <div class="container-xl position-relative">
+    <div class="row">
+      <div class="col-lg-7">
+        <div class="res-hero-badge"><i class="bi bi-stars me-1"></i>Centro de Recursos Profesionales</div>
+        <h1>Todo lo que necesitas para<br/><em>crecer profesionalmente</em></h1>
+        <p>Guías, artículos, plantillas y tutoriales diseñados para impulsar tu carrera en El Salvador y más allá.</p>
+        <div class="res-search-bar">
+          <input type="text" id="heroSearch" placeholder="Buscar recursos… Ej: entrevista, CV, salario" onkeyup="handleHeroSearch(event)"/>
+          <button onclick="applySearch()"><i class="bi bi-search me-1"></i>Buscar</button>
+        </div>
+        <div class="res-stats">
+          <div class="res-stat"><div class="res-stat-val">24+</div><div class="res-stat-lbl">Artículos</div></div>
+          <div class="res-stat"><div class="res-stat-val">12</div><div class="res-stat-lbl">Plantillas PDF</div></div>
+          <div class="res-stat"><div class="res-stat-val">8</div><div class="res-stat-lbl">Video Guías</div></div>
+          <div class="res-stat"><div class="res-stat-val">100%</div><div class="res-stat-lbl">Gratis</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TABS DE CATEGORÍAS ───────────────────────────────────── -->
+<div class="res-tabs-wrap">
+  <div class="container-xl">
+    <div class="res-tabs" id="resTabs">
+      <button class="res-tab active" data-cat="all" onclick="filterByTab('all', this)"><i class="bi bi-grid-fill"></i>Todo</button>
+      <button class="res-tab" data-cat="cv" onclick="filterByTab('cv', this)"><i class="bi bi-file-earmark-person"></i>Mejora tu CV</button>
+      <button class="res-tab" data-cat="interview" onclick="filterByTab('interview', this)"><i class="bi bi-mic-fill"></i>Entrevistas</button>
+      <button class="res-tab" data-cat="skills" onclick="filterByTab('skills', this)"><i class="bi bi-lightning-fill"></i>Habilidades</button>
+      <button class="res-tab" data-cat="career" onclick="filterByTab('career', this)"><i class="bi bi-graph-up-arrow"></i>Carrera</button>
+      <button class="res-tab" data-cat="news" onclick="filterByTab('news', this)"><i class="bi bi-newspaper"></i>Noticias</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENIDO PRINCIPAL ──────────────────────────────────── -->
+<div class="container-xl">
+  <div class="res-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="res-sidebar d-none d-lg-block">
+
+      <div class="res-sidebar-card">
+        <div class="res-sidebar-title"><i class="bi bi-funnel"></i>Filtrar por tipo</div>
+        <button class="res-filter-btn active" data-type="all" onclick="filterByType('all', this)">
+          <i class="bi bi-grid"></i>Todos los tipos
+          <span class="badge-count" id="countAll">24</span>
+        </button>
+        <button class="res-filter-btn" data-type="article" onclick="filterByType('article', this)">
+          <i class="bi bi-file-text"></i>Artículos
+          <span class="badge-count" id="countArticle">10</span>
+        </button>
+        <button class="res-filter-btn" data-type="video" onclick="filterByType('video', this)">
+          <i class="bi bi-play-circle"></i>Videos
+          <span class="badge-count" id="countVideo">6</span>
+        </button>
+        <button class="res-filter-btn" data-type="pdf" onclick="filterByType('pdf', this)">
+          <i class="bi bi-file-earmark-pdf"></i>PDFs / Plantillas
+          <span class="badge-count" id="countPdf">5</span>
+        </button>
+        <button class="res-filter-btn" data-type="guide" onclick="filterByType('guide', this)">
+          <i class="bi bi-book"></i>Guías paso a paso
+          <span class="badge-count" id="countGuide">3</span>
+        </button>
+      </div>
+
+      <div class="res-sidebar-card">
+        <div class="res-sidebar-title"><i class="bi bi-tag"></i>Temas populares</div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-sm" style="border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-m);padding:4px 10px" onclick="quickTagSearch('LinkedIn')">LinkedIn</button>
+          <button class="btn btn-sm" style="border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-m);padding:4px 10px" onclick="quickTagSearch('Salario')">Salario</button>
+          <button class="btn btn-sm" style="border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-m);padding:4px 10px" onclick="quickTagSearch('Remoto')">Remoto</button>
+          <button class="btn btn-sm" style="border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-m);padding:4px 10px" onclick="quickTagSearch('Soft Skills')">Soft Skills</button>
+          <button class="btn btn-sm" style="border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-m);padding:4px 10px" onclick="quickTagSearch('Freelance')">Freelance</button>
+          <button class="btn btn-sm" style="border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-m);padding:4px 10px" onclick="quickTagSearch('Portafolio')">Portafolio</button>
+        </div>
+      </div>
+
+      <!-- Newsletter sidebar -->
+      <div class="res-newsletter">
+        <h5>📬 Recursos al correo</h5>
+        <p>Recibe cada semana las últimas guías y artículos directamente en tu bandeja.</p>
+        <div class="res-nl-form">
+          <input type="email" placeholder="tu@correo.com"/>
+          <button>Suscribir</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+
+      <!-- Banner plantillas -->
+      <div class="res-banner">
+        <div class="res-banner-icon"><i class="bi bi-file-earmark-arrow-down"></i></div>
+        <div>
+          <h4>Plantillas de CV gratuitas</h4>
+          <p>Descarga nuestras plantillas profesionales en PDF y Word, diseñadas para el mercado laboral salvadoreño.</p>
+        </div>
+        <button class="btn tb-btn-primary ms-auto flex-shrink-0" onclick="filterByTab('cv', document.querySelector('[data-cat=cv]'))">
+          <i class="bi bi-download me-1"></i>Ver plantillas
+        </button>
+      </div>
+
+      <!-- Sección destacada CTA -->
+      <div class="res-cta">
+        <h3>¿Listo para tu próxima entrevista?</h3>
+        <p>Accede a nuestra guía completa con las 50 preguntas más frecuentes y cómo responderlas con confianza.</p>
+        <div class="res-cta-btns">
+          <button class="btn tb-btn-primary" onclick="filterByTab('interview', document.querySelector('[data-cat=interview]'))">
+            <i class="bi bi-mic-fill me-1"></i>Ver guía de entrevistas
+          </button>
+          <button class="btn tb-btn-ghost" style="border-color:rgba(255,255,255,.3);color:#fff" onclick="window.location.href='../index.html'">
+            <i class="bi bi-briefcase me-1"></i>Buscar empleos
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultado contador -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p style="font-size:13px;color:var(--text-m);margin:0" id="resultsLabel">Mostrando <strong id="resultsCount">24</strong> recursos</p>
+        <select style="border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);background:var(--surface);font-family:var(--font-body)" id="sortSelect" onchange="sortCards()">
+          <option value="recent">Más recientes</option>
+          <option value="popular">Más populares</option>
+          <option value="az">A – Z</option>
+        </select>
+      </div>
+
+      <!-- GRID DE TARJETAS -->
+      <div class="res-grid" id="resGrid"></div>
+
+      <div class="res-empty" id="resEmpty" style="display:none">
+        <i class="bi bi-search"></i>
+        <p>No se encontraron recursos con ese criterio.</p>
+        <button class="btn tb-btn-primary mt-2" onclick="resetFilters()">Ver todos los recursos</button>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── FOOTER ───────────────────────────────────────────────── -->
+<footer class="tb-footer">
+  <div class="container-xl">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="tb-brand mb-3" style="display:flex;align-items:center;gap:10px">
+          <span class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L4.5 13.5H11.5L10 22L20.5 9.5H13.5L13 2Z" fill="#9ca3b0" stroke="#9ca3b0" stroke-width="0.5" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
+        </div>
+        <p class="small tb-text-muted">Conectando talento con oportunidades en El Salvador. Tu próxima oportunidad está a un clic.</p>
+      </div>
+      <div class="col-md-2">
+        <h6 class="tb-footer-heading">Plataforma</h6>
+        <ul class="tb-footer-links">
+          <li><a href="../index.html">Explorar Empleos</a></li>
+          <li><a href="../index.html">Foro</a></li>
+          <li><a href="recursos.html">Recursos</a></li>
+          <li><a href="../index.html">Registrarse</a></li>
+        </ul>
+      </div>
+      <div class="col-md-2">
+        <h6 class="tb-footer-heading">Empresa</h6>
+        <ul class="tb-footer-links">
+          <li><a href="#">Sobre Nosotros</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="tb-footer-heading">Newsletter</h6>
+        <p class="small tb-text-muted">Recibe las mejores oportunidades en tu correo.</p>
+        <div class="res-nl-form">
+          <input type="email" placeholder="correo@ejemplo.com"/>
+          <button>Suscribir</button>
+        </div>
+      </div>
+    </div>
+    <hr class="tb-footer-divider"/>
+    <div class="d-flex flex-wrap justify-content-between align-items-center">
+      <p class="small tb-text-muted mb-0">© 2024 ConectaSV. Todos los derechos reservados.</p>
+      <div class="d-flex gap-3">
+        <a href="#" class="tb-social"><i class="bi bi-linkedin"></i></a>
+        <a href="#" class="tb-social"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" class="tb-social"><i class="bi bi-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================================
+//  recursos.html — Datos y lógica de filtrado
+// ============================================================
+
+const RESOURCES = [
+  // ── CV ──
+  { id:1, cat:'cv', type:'pdf', title:'Plantilla de CV Minimalista', desc:'Diseño limpio y profesional ideal para cargos en tecnología, marketing y administración. Formato Word + PDF incluidos.', thumb:'thumb-purple', icon:'📄', views:1420, date:'2024-04-10', tags:['CV','Plantilla','Word'] },
+  { id:2, cat:'cv', type:'guide', title:'Cómo escribir un resumen profesional que llame la atención', desc:'Aprende a redactar las primeras 3 líneas de tu CV que determinan si el reclutador sigue leyendo o no.', thumb:'thumb-blue', icon:'✍️', views:980, date:'2024-03-28', tags:['CV','Redacción','Reclutadores'] },
+  { id:3, cat:'cv', type:'article', title:'Los 7 errores más comunes en un CV en El Salvador', desc:'Análisis de los errores que hacen que tu currículum sea descartado en los primeros 30 segundos.', thumb:'thumb-red', icon:'⚠️', views:2100, date:'2024-04-02', tags:['CV','Errores','El Salvador'] },
+  { id:4, cat:'cv', type:'pdf', title:'Plantilla de CV Creativo para Diseñadores', desc:'Perfecta para profesionales del diseño, publicidad y artes visuales. Destaca con un formato visual y moderno.', thumb:'thumb-orange', icon:'🎨', views:760, date:'2024-03-15', tags:['CV','Diseño','Creativo'] },
+  { id:5, cat:'cv', type:'article', title:'CV en inglés: guía para candidatos bilingües', desc:'Cómo adaptar tu currículum cuando aplicas a empresas internacionales o multinacionales en El Salvador.', thumb:'thumb-green', icon:'🌍', views:540, date:'2024-04-05', tags:['CV','Inglés','Bilingüe'] },
+
+  // ── ENTREVISTAS ──
+  { id:6, cat:'interview', type:'guide', title:'50 preguntas frecuentes de entrevista (con respuestas)', desc:'La guía definitiva con las preguntas más comunes en entrevistas laborales y cómo estructurar tus respuestas usando el método STAR.', thumb:'thumb-blue', icon:'🎯', views:3400, date:'2024-04-12', tags:['Entrevista','STAR','Preparación'] },
+  { id:7, cat:'interview', type:'video', title:'Cómo responder "¿Cuál es tu mayor debilidad?"', desc:'Tutorial en video con ejemplos reales y la psicología detrás de esta pregunta trampa que aparece en casi todas las entrevistas.', thumb:'thumb-red', icon:'🎥', views:2800, date:'2024-04-08', tags:['Entrevista','Video','Debilidades'] },
+  { id:8, cat:'interview', type:'article', title:'Lenguaje corporal en entrevistas: lo que no debes hacer', desc:'Señales no verbales que comunican inseguridad y cómo proyectar confianza desde el momento en que entras a la sala.', thumb:'thumb-orange', icon:'🤝', views:1150, date:'2024-03-20', tags:['Entrevista','Lenguaje Corporal','Confianza'] },
+  { id:9, cat:'interview', type:'article', title:'Mock interview: cómo practicar antes de la entrevista real', desc:'Estrategias y ejercicios para simular entrevistas, incluyendo recursos gratuitos en línea para candidatos salvadoreños.', thumb:'thumb-purple', icon:'🎭', views:620, date:'2024-04-01', tags:['Entrevista','Práctica','Mock'] },
+
+  // ── HABILIDADES ──
+  { id:10, cat:'skills', type:'guide', title:'Las 10 habilidades más demandadas en El Salvador 2024', desc:'Análisis del mercado laboral local: qué habilidades técnicas y blandas buscan las empresas este año.', thumb:'thumb-green', icon:'📊', views:1900, date:'2024-04-14', tags:['Habilidades','Mercado','2024'] },
+  { id:11, cat:'skills', type:'article', title:'Cómo mejorar tus soft skills sin tomar ningún curso', desc:'Actividades del día a día que desarrollan comunicación, liderazgo, empatía y trabajo en equipo.', thumb:'thumb-yellow', icon:'🌟', views:870, date:'2024-03-25', tags:['Soft Skills','Comunicación','Liderazgo'] },
+  { id:12, cat:'skills', type:'video', title:'Excel avanzado para profesionales: tablas dinámicas en 20 minutos', desc:'Tutorial práctico enfocado en las funciones que más piden las empresas en roles administrativos y financieros.', thumb:'thumb-green', icon:'📈', views:2300, date:'2024-04-07', tags:['Excel','Habilidades Técnicas','Tutorial'] },
+  { id:13, cat:'skills', type:'article', title:'Certificaciones gratuitas en línea que valen en el mercado laboral', desc:'Lista curada de certificaciones de Google, Meta, HubSpot y Coursera que puedes obtener sin costo y agregar a tu CV.', thumb:'thumb-blue', icon:'🏆', views:1560, date:'2024-03-30', tags:['Certificaciones','Gratis','Online'] },
+  { id:14, cat:'skills', type:'video', title:'LinkedIn para candidatos: optimiza tu perfil en 30 minutos', desc:'Paso a paso para construir un perfil de LinkedIn que atraiga reclutadores y aparezca en búsquedas.', thumb:'thumb-purple', icon:'💼', views:3100, date:'2024-04-11', tags:['LinkedIn','Perfil','Redes Profesionales'] },
+
+  // ── CARRERA ──
+  { id:15, cat:'career', type:'article', title:'Cómo negociar tu salario sin arruinar la oferta', desc:'Tácticas probadas para negociar con confianza, incluyendo frases específicas y cuándo es el momento adecuado para hablar de dinero.', thumb:'thumb-orange', icon:'💰', views:2600, date:'2024-04-13', tags:['Salario','Negociación','Carrera'] },
+  { id:16, cat:'career', type:'guide', title:'Plan de carrera en 5 años: cómo trazarlo paso a paso', desc:'Metodología práctica para definir objetivos profesionales y las acciones concretas para alcanzarlos cada año.', thumb:'thumb-blue', icon:'🗺️', views:740, date:'2024-03-22', tags:['Carrera','Planificación','Objetivos'] },
+  { id:17, cat:'career', type:'article', title:'Trabajo remoto en El Salvador: guía completa 2024', desc:'Todo lo que necesitas saber sobre el marco legal, plataformas para encontrar trabajo remoto y cómo organizarte.', thumb:'thumb-green', icon:'🏠', views:1830, date:'2024-04-06', tags:['Remoto','El Salvador','Freelance'] },
+  { id:18, cat:'career', type:'article', title:'Cuándo es el momento de pedir un aumento', desc:'Señales claras de que es el momento correcto y cómo preparar el argumento para hablar con tu jefe.', thumb:'thumb-yellow', icon:'📅', views:980, date:'2024-03-18', tags:['Salario','Aumento','Carrera'] },
+  { id:19, cat:'career', type:'video', title:'De empleado a emprendedor: historias reales salvadoreñas', desc:'Entrevistas con profesionales que hicieron el salto y los pasos que siguieron para lograr independencia económica.', thumb:'thumb-red', icon:'🚀', views:1420, date:'2024-04-03', tags:['Emprendimiento','Historias','Motivación'] },
+
+  // ── NOTICIAS ──
+  { id:20, cat:'news', type:'article', title:'Mercado laboral en El Salvador: tendencias Q2 2024', desc:'Análisis de los sectores con mayor crecimiento en contratación, salarios promedio y perfiles más buscados.', thumb:'thumb-blue', icon:'📰', views:1100, date:'2024-04-15', tags:['Tendencias','Mercado','2024'] },
+  { id:21, cat:'news', type:'article', title:'Industrias tecnológicas en auge: oportunidades en FinTech y EdTech', desc:'El crecimiento de startups salvadoreñas y las vacantes que están generando para profesionales locales.', thumb:'thumb-purple', icon:'💡', views:890, date:'2024-04-09', tags:['Tecnología','FinTech','Startups'] },
+  { id:22, cat:'news', type:'article', title:'Cambios en la Ley Laboral 2024: lo que todo trabajador debe saber', desc:'Resumen de los cambios legislativos recientes y cómo afectan tus derechos como empleado o contratista.', thumb:'thumb-red', icon:'⚖️', views:1650, date:'2024-04-04', tags:['Ley Laboral','Derechos','2024'] },
+  { id:23, cat:'news', type:'article', title:'Los sectores que más contratan en centroamérica este trimestre', desc:'Reporte regional con datos de empleo en Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica y Panamá.', thumb:'thumb-green', icon:'🌎', views:720, date:'2024-03-27', tags:['Centroamérica','Empleo','Regional'] },
+  { id:24, cat:'news', type:'video', title:'Análisis de salarios 2024 por área y experiencia', desc:'Video-informe con los rangos salariales actualizados por industria, cargo y años de experiencia en El Salvador.', thumb:'thumb-orange', icon:'📊', views:2200, date:'2024-04-16', tags:['Salarios','Análisis','Video'] },
+];
+
+const TYPE_LABELS = { article:'Artículo', video:'Video', pdf:'Plantilla PDF', guide:'Guía' };
+const TYPE_CLASSES = { article:'type-article', video:'type-video', pdf:'type-pdf', guide:'type-guide' };
+const CAT_LABELS   = { cv:'CV', interview:'Entrevista', skills:'Habilidades', career:'Carrera', news:'Noticias' };
+const CAT_CLASSES  = { cv:'cat-cv', interview:'cat-interview', skills:'cat-skills', career:'cat-career', news:'cat-news' };
+
+let activeTab  = 'all';
+let activeType = 'all';
+let searchQ    = '';
+
+function renderCards(list) {
+  const grid  = document.getElementById('resGrid');
+  const empty = document.getElementById('resEmpty');
+  document.getElementById('resultsCount').textContent = list.length;
+
+  if (!list.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(r => `
+    <div class="res-card" data-id="${r.id}">
+      <div class="res-card-thumb ${r.thumb}">${r.icon}</div>
+      <div class="res-card-body">
+        <div>
+          <span class="res-card-cat ${CAT_CLASSES[r.cat] || 'cat-career'}">
+            ${CAT_LABELS[r.cat] || r.cat}
+          </span>
+          <span class="content-type-pill ${TYPE_CLASSES[r.type]} ms-1">
+            ${TYPE_LABELS[r.type] || r.type}
+          </span>
+        </div>
+        <h3 class="res-card-title">${r.title}</h3>
+        <p class="res-card-desc">${r.desc}</p>
+      </div>
+      <div class="res-card-footer">
+        <div class="res-card-meta">
+          <i class="bi bi-eye"></i>${r.views.toLocaleString()} vistas
+          &nbsp;·&nbsp;
+          <i class="bi bi-calendar3"></i>${formatDate(r.date)}
+        </div>
+        <a href="#" class="res-card-action" onclick="openResource(${r.id}, event)">
+          ${r.type === 'video' ? '<i class="bi bi-play-fill"></i>Ver video' :
+            r.type === 'pdf'   ? '<i class="bi bi-download"></i>Descargar' :
+                                  '<i class="bi bi-book-fill"></i>Leer'}
+        </a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getFiltered() {
+  return RESOURCES.filter(r => {
+    const matchCat  = activeTab  === 'all' || r.cat  === activeTab;
+    const matchType = activeType === 'all' || r.type === activeType;
+    const matchQ    = !searchQ   || r.title.toLowerCase().includes(searchQ) ||
+                      r.desc.toLowerCase().includes(searchQ) ||
+                      r.tags.some(t => t.toLowerCase().includes(searchQ));
+    return matchCat && matchType && matchQ;
+  });
+}
+
+function applySort(list) {
+  const val = document.getElementById('sortSelect').value;
+  return [...list].sort((a,b) => {
+    if (val === 'popular') return b.views - a.views;
+    if (val === 'az')      return a.title.localeCompare(b.title);
+    return new Date(b.date) - new Date(a.date);
+  });
+}
+
+function refresh() { renderCards(applySort(getFiltered())); }
+
+function filterByTab(cat, el) {
+  activeTab = cat;
+  document.querySelectorAll('.res-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  refresh();
+}
+
+function filterByType(type, el) {
+  activeType = type;
+  document.querySelectorAll('.res-filter-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  refresh();
+}
+
+function sortCards() { refresh(); }
+
+function applySearch() {
+  searchQ = document.getElementById('heroSearch').value.trim().toLowerCase();
+  refresh();
+  if (searchQ) document.querySelector('.res-layout').scrollIntoView({ behavior:'smooth' });
+}
+
+function handleHeroSearch(e) { if (e.key === 'Enter') applySearch(); }
+
+function quickTagSearch(tag) {
+  document.getElementById('heroSearch').value = tag;
+  applySearch();
+}
+
+function resetFilters() {
+  activeTab = 'all'; activeType = 'all'; searchQ = '';
+  document.getElementById('heroSearch').value = '';
+  document.querySelectorAll('.res-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('.res-filter-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  refresh();
+}
+
+function openResource(id, e) {
+  e.preventDefault();
+  const r = RESOURCES.find(x => x.id === id);
+  if (!r) return;
+  // Aquí puedes conectar a tu backend o abrir un modal
+  alert(`📖 "${r.title}"\n\nConecta este recurso a tu backend o enlace externo real.`);
+}
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('es-SV', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// Actualizar contadores del sidebar
+function updateCounts() {
+  document.getElementById('countAll').textContent     = RESOURCES.length;
+  document.getElementById('countArticle').textContent = RESOURCES.filter(r=>r.type==='article').length;
+  document.getElementById('countVideo').textContent   = RESOURCES.filter(r=>r.type==='video').length;
+  document.getElementById('countPdf').textContent     = RESOURCES.filter(r=>r.type==='pdf').length;
+  document.getElementById('countGuide').textContent   = RESOURCES.filter(r=>r.type==='guide').length;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateCounts();
+  refresh();
+  initNavbarSession(); // ← restaurar sesión activa
+});
+
+// ── SESIÓN EN NAVBAR ─────────────────────────────────────────
+function initNavbarSession() {
+  const storedCandidate = sessionStorage.getItem('candidateUser');
+  const storedEmployer  = sessionStorage.getItem('employerUser');
+  const user = storedCandidate ? JSON.parse(storedCandidate)
+             : storedEmployer  ? JSON.parse(storedEmployer)
+             : null;
+  if (user) updateNavbarRecursos(user);
+}
+
+function updateNavbarRecursos(user) {
+  const avatarEl = document.getElementById('navAvatar');
+
+  // Foto de perfil o iniciales
+  if (user.profile_photo_url) {
+    avatarEl.style.backgroundImage    = `url('${user.profile_photo_url}')`;
+    avatarEl.style.backgroundSize     = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.textContent = '';
+  } else {
+    avatarEl.style.backgroundImage = '';
+    avatarEl.textContent = `${(user.first_name||'')[0]}${(user.last_name||'')[0]}`.toUpperCase();
+  }
+
+  document.getElementById('navUserName').textContent =
+    `${user.first_name} ${user.last_name}`;
+
+  // Enlace al panel según rol
+  const profileLink = document.getElementById('navProfileLink');
+  if (profileLink) {
+    profileLink.href = user.role === 'employer' ? '../employee.html' : '../candidate.html';
+  }
+
+  // Intercambiar botones
+  document.getElementById('authControls').style.setProperty('display', 'none',  'important');
+  document.getElementById('userControls').style.setProperty('display', 'flex',  'important');
+}
+
+function logoutRecursos() {
+  sessionStorage.removeItem('candidateUser');
+  sessionStorage.removeItem('employerUser');
+  document.getElementById('authControls').style.setProperty('display', 'flex', 'important');
+  document.getElementById('userControls').style.setProperty('display', 'none', 'important');
+}
+</script>
+</body>
+</html>

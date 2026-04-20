@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import {
+    getAllApplications,
     getApplicationsByJob, getApplicationsByCandidate,
     createApplication, updateApplicationStatus, deleteApplication
 } from '../controllers/applications.controller.js';
 
 const router = Router();
+
+// GET /api/applications — todas las postulaciones
+router.get('/', getAllApplications);
 
 // GET /api/applications/job/:jobId — postulaciones de un empleo
 router.get('/job/:jobId', getApplicationsByJob);

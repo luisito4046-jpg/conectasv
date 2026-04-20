@@ -7,7 +7,7 @@ import {
     updateUser,
     deleteUser,
 } from '../services/users.service.js';
-import { uploadToCloudinary } from '../middleware/upload.js';// ← solo este
+import { uploadToCloudinary, uploadToCloudinaryRaw } from '../middleware/upload.js'; // ← ambos
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -62,7 +62,7 @@ export const actualizarUsuario = async (req, res) => {
 
         if (req.file) {
             const publicId = `user_${req.params.id_usuario}_${Date.now()}`;
-            const result   = await uploadToCloudinary(req.file.buffer, publicId); // ← buffer
+            const result   = await uploadToCloudinary(req.file.buffer, publicId);
             userData.profile_photo_url = result.secure_url;
         }
 
@@ -87,12 +87,34 @@ export const eliminarUsuario = async (req, res) => {
 
 export const actualizarFotoPerfil = async (req, res) => {
     try {
-        const url = req.file?.path; // Cloudinary pone la URL aquí
-        if (!url) return res.status(400).json({ error: 'No se recibió ninguna imagen.' });
+        if (!req.file) return res.status(400).json({ error: 'No se recibió ninguna imagen.' });
 
-        const user = await updateUser(req.params.id, { profile_photo_url: url });
-        res.json({ message: 'Foto actualizada', profile_photo_url: url });
+        const publicId = `user_${req.params.id}_${Date.now()}`;
+        const result   = await uploadToCloudinary(req.file.buffer, publicId, 'conectasv/profiles');
+
+        const user = await updateUser(req.params.id, { profile_photo_url: result.secure_url });
+        res.json({ message: 'Foto actualizada', profile_photo_url: result.secure_url });
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// ✅ NUEVO: Sube CV en PDF a Cloudinary y guarda la URL en la base de datos
+export const actualizarCV = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No se recibió ningún archivo PDF.' });
+        }
+
+        const publicId = `cv_${req.params.id}_${Date.now()}`;
+        const result   = await uploadToCloudinaryRaw(req.file.buffer, publicId, 'conectasv/cvs');
+
+        const user = await updateUser(req.params.id, { cv_url: result.secure_url });
+        if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        res.json({ message: 'CV actualizado correctamente', cv_url: result.secure_url });
+    } catch (err) {
+        console.error('ERROR actualizarCV:', err);
         res.status(500).json({ error: err.message });
     }
 };

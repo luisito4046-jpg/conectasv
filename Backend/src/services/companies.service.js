@@ -29,19 +29,40 @@ export const insertCompany = async ({ owner_id, name, logo, industry, size, webs
              (owner_id, name, logo, industry, size, website, description, location)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [owner_id, name, logo, industry, size, website, description, location]
+        [owner_id, name, logo ?? null, industry ?? null, size ?? null,
+         website ?? null, description ?? null, location ?? null]
     );
     return result.rows[0];
 };
 
-export const updateCompany = async (id, { name, logo, industry, size, website, description, location, verified }) => {
+// UPDATE dinámico — solo actualiza los campos que lleguen (igual que users.service.js)
+// Incluye logo_url para soportar subida de logo a Cloudinary
+export const updateCompany = async (id, data) => {
+    const fields = [
+        'name', 'logo', 'logo_url', 'industry', 'size',
+        'website', 'description', 'location', 'verified'
+    ];
+
+    const updates = [];
+    const values  = [];
+    let   index   = 1;
+
+    for (const field of fields) {
+        if (data[field] !== undefined && data[field] !== '') {
+            updates.push(`${field} = $${index}`);
+            values.push(data[field]);
+            index++;
+        }
+    }
+
+    if (updates.length === 0) return null;
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
     const result = await pool.query(
-        `UPDATE companies
-         SET name=$1, logo=$2, industry=$3, size=$4, website=$5,
-             description=$6, location=$7, verified=$8, updated_at=CURRENT_TIMESTAMP
-         WHERE id=$9
-         RETURNING *`,
-        [name, logo, industry, size, website, description, location, verified, id]
+        `UPDATE companies SET ${updates.join(', ')} WHERE id = $${index} RETURNING *`,
+        values
     );
     return result.rows[0] ?? null;
 };

@@ -268,25 +268,23 @@ window.updateCandidateStatus = async function (appId, newStatus, jobId, jobTitle
 // ── VER PERFIL DEL CANDIDATO (MODAL) ─────────────────────────
 window.viewCandidateDetail = async function (candidateId) {
     try {
-        const res = await fetch(`/api/users/buscarPorEmail/placeholder`);
-        // Usaremos el endpoint de todos los usuarios y filtramos
-        const allRes = await fetch('/api/users');
-        const users = await allRes.json();
-        const user = users.find(u => u.id === candidateId);
+        const res  = await fetch(`/api/users/${candidateId}`);
+        if (!res.ok) { showToastNotif('Candidato no encontrado', 'error'); return; }
+        const user = await res.json();
 
-        if (!user) {
-            showToastNotif('Candidato no encontrado', 'error');
-            return;
-        }
+        const avatar = user.profile_photo_url
+            ? `<img src="${user.profile_photo_url}" alt="Avatar"
+                    style="width:56px;height:56px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+            : `<div style="width:56px;height:56px;border-radius:50%;background:var(--accent,#e8943a);
+                    color:#fff;display:flex;align-items:center;justify-content:center;
+                    font-size:20px;font-weight:700;flex-shrink:0">
+                   ${user.first_name[0]}${user.last_name[0]}
+               </div>`;
 
-        const initials = `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
         const body = document.getElementById('candidateDetailBody');
-
         body.innerHTML = `
             <div class="d-flex align-items-center gap-3 mb-4">
-                <div style="width:56px;height:56px;border-radius:50%;background:var(--accent,#e8943a);
-                     color:#fff;display:flex;align-items:center;justify-content:center;
-                     font-size:20px;font-weight:700">${initials}</div>
+                ${avatar}
                 <div>
                     <h5 class="mb-0" style="font-weight:700">${user.first_name} ${user.last_name}</h5>
                     <p class="mb-0 small" style="color:#888">${user.role === 'candidate' ? 'Candidato' : user.role}</p>
@@ -309,7 +307,9 @@ window.viewCandidateDetail = async function (candidateId) {
                     <label class="tb-label">Estado</label>
                     <p style="font-size:14px">
                         <span class="badge bg-${user.status === 'active' ? 'success' : 'danger'} bg-opacity-10 
-                              text-${user.status === 'active' ? 'success' : 'danger'}">${user.status === 'active' ? 'Activo' : 'Suspendido'}</span>
+                              text-${user.status === 'active' ? 'success' : 'danger'}">
+                            ${user.status === 'active' ? 'Activo' : 'Suspendido'}
+                        </span>
                     </p>
                 </div>
                 <div class="col-12">
@@ -318,9 +318,7 @@ window.viewCandidateDetail = async function (candidateId) {
                 </div>
             </div>`;
 
-        const modal = new bootstrap.Modal(document.getElementById('candidateDetailModal'));
-        modal.show();
-
+        new bootstrap.Modal(document.getElementById('candidateDetailModal')).show();
     } catch (err) {
         showToastNotif('Error al cargar perfil del candidato', 'error');
     }
@@ -393,6 +391,38 @@ window.deleteEmployerJob = async function (jobId) {
 
     } catch (err) {
         showToastNotif('Error de conexión', 'error');
+    }
+};
+
+// ── ACTUALIZAR FOTO DE PERFIL (EMPLOYER) ─────────────────────
+window.uploadProfilePhoto = async function () {
+    const fileInput = document.getElementById('photoInput');
+    if (!fileInput?.files[0]) {
+        showToastNotif('Selecciona una imagen primero', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('photo', fileInput.files[0]);
+
+    try {
+        const res  = await fetch(`/api/users/${currentUser.id}/avatar`, {
+            method: 'PATCH',
+            body: formData,
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            showToastNotif(data.error || 'Error al subir foto', 'error');
+            return;
+        }
+
+        const avatar = document.getElementById('employerAvatar');
+        if (avatar) avatar.src = data.profile_photo_url;
+
+        showToastNotif('Foto de perfil actualizada');
+    } catch (err) {
+        showToastNotif('Error de conexión al subir foto', 'error');
     }
 };
 

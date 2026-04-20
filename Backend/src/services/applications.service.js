@@ -1,5 +1,20 @@
 import { pool } from '../config/db.js';
 
+export const findAllApplications = async () => {
+    const result = await pool.query(
+        `SELECT a.*,
+                u.first_name, u.last_name,
+                j.title AS job_title,
+                c.name AS company_name
+         FROM applications a
+         JOIN users u ON a.candidate_id = u.id
+         JOIN jobs j ON a.job_id = j.id
+         JOIN companies c ON c.id = j.company_id
+         ORDER BY a.applied_at DESC`
+    );
+    return result.rows;
+};
+
 export const findApplicationsByJob = async (jobId) => {
     const result = await pool.query(
         `SELECT a.*,

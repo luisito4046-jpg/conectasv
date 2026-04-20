@@ -255,7 +255,7 @@
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <aside class="admin-sidebar" id="adminSidebar">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" style="cursor:pointer" onclick="window.location.href='/'" title="Volver al inicio">
     <div class="brand-icon">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path d="M13 2L4.5 13.5H11.5L10 22L20.5 9.5H13.5L13 2Z" fill="#9ca3b0" stroke="#9ca3b0" stroke-width="0.5" stroke-linejoin="round"/>
@@ -303,10 +303,10 @@
     <section id="sec-dashboard">
       <div class="section-title"><i class="bi bi-activity me-1"></i>Resumen de tu Empresa</div>
       <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3"><div class="metric-card c-blue"><div class="metric-icon"><i class="bi bi-briefcase-fill"></i></div><div class="metric-value" id="metricJobs">0</div><div class="metric-label">Vacantes Publicadas</div><button class="tb-btn-ghost mt-3" onclick="showSection('vacantes', document.querySelector(\"[onclick=\\\"showSection('vacantes',this)\\\"]\"))">Ver vacantes</button></div></div>
-        <div class="col-6 col-md-3"><div class="metric-card c-accent"><div class="metric-icon"><i class="bi bi-people-fill"></i></div><div class="metric-value" id="metricApps">0</div><div class="metric-label">Postulaciones Total</div><button class="tb-btn-ghost mt-3" onclick="showSection('postulantes', document.querySelector(\"[onclick=\\\"showSection('postulantes',this)\\\"]\"))">Revisar ahora</button></div></div>
-        <div class="col-6 col-md-3"><div class="metric-card c-green"><div class="metric-icon"><i class="bi bi-building"></i></div><div class="metric-value" id="metricCompanies">0</div><div class="metric-label">Empresas registradas</div><button class="tb-btn-ghost mt-3" onclick="showSection('perfil', document.querySelector(\"[onclick=\\\"showSection('perfil',this)\\\"]\"))">Editar empresa</button></div></div>
-        <div class="col-6 col-md-3"><div class="metric-card c-warn"><div class="metric-icon"><i class="bi bi-plus-circle-fill"></i></div><div class="metric-value" id="metricActiveJobs">0</div><div class="metric-label">Vacantes activas</div><button class="tb-btn-ghost mt-3" onclick="showSection('publicar', document.querySelector(\"[onclick=\\\"showSection('publicar',this)\\\"]\"))">Publicar vacante</button></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-blue"><div class="metric-icon"><i class="bi bi-briefcase-fill"></i></div><div class="metric-value" id="metricJobs">0</div><div class="metric-label">Vacantes Publicadas</div><button class="tb-btn-ghost mt-3" onclick="navTo('vacantes')">Ver vacantes</button></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-accent"><div class="metric-icon"><i class="bi bi-people-fill"></i></div><div class="metric-value" id="metricApps">0</div><div class="metric-label">Postulaciones Total</div><button class="tb-btn-ghost mt-3" onclick="navTo('postulantes')">Revisar ahora</button></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-green"><div class="metric-icon"><i class="bi bi-building"></i></div><div class="metric-value" id="metricCompanies">0</div><div class="metric-label">Empresas registradas</div><button class="tb-btn-ghost mt-3" onclick="navTo('perfil')">Editar empresa</button></div></div>
+        <div class="col-6 col-md-3"><div class="metric-card c-warn"><div class="metric-icon"><i class="bi bi-plus-circle-fill"></i></div><div class="metric-value" id="metricActiveJobs">0</div><div class="metric-label">Vacantes activas</div><button class="tb-btn-ghost mt-3" onclick="navTo('publicar')">Publicar vacante</button></div></div>
       </div>
 
       <div class="data-card">
@@ -470,6 +470,17 @@
               <div class="mb-3"><label class="tb-label">Sitio Web</label><input type="url" class="form-control tb-input" id="companyWebsite"/></div>
               <div class="mb-3"><label class="tb-label">Ubicación</label><input type="text" class="form-control tb-input" id="companyLocation"/></div>
               <div class="mb-3"><label class="tb-label">Descripción</label><textarea class="form-control tb-input" rows="3" id="companyDescription"></textarea></div>
+              <!-- Logo de empresa — se sube a Cloudinary con el campo "company_logo" -->
+              <div class="mb-3">
+                <label class="tb-label">Logo de la Empresa</label>
+                <input type="file" class="form-control tb-input" id="companyLogoFile" accept="image/*" onchange="previewCompanyLogo()"/>
+              </div>
+              <div class="mb-3" id="companyLogoPreviewWrap" style="display:none">
+                <label class="tb-label">Vista previa</label>
+                <div class="profile-photo-preview">
+                  <img id="companyLogoPreview" src="" alt="Logo empresa" style="display:none;width:80px;height:80px;object-fit:cover;border-radius:8px"/>
+                </div>
+              </div>
               <div class="mb-3"><label class="tb-label">Verificación</label><p id="companyVerifiedLabel" style="font-size:13px;color:var(--text-m)">—</p></div>
               <div class="d-flex gap-2 flex-wrap">
                 <button class="btn tb-btn-primary" onclick="saveCompanyProfile()"><i class="bi bi-save me-2"></i>Guardar Empresa</button>
@@ -549,7 +560,7 @@ async function loadMyCompanies() {
 function setUserUI() {
     if (!currentUser) return;
     const avatarEl = document.getElementById('topbarAvatar');
-    const ini = `${currentUser.first_name[0]}${currentUser.last_name[0]}`.toUpperCase();
+    const ini = `${(currentUser.first_name || 'E')[0]}${(currentUser.last_name || 'M')[0]}`.toUpperCase();
     if (currentUser.profile_photo_url) {
         avatarEl.style.backgroundImage = `url("${currentUser.profile_photo_url}")`;
         avatarEl.style.backgroundSize = 'cover';
@@ -624,43 +635,65 @@ function loadSelectedCompany() {
 }
 
 async function saveCompanyProfile() {
-    const companyId = document.getElementById('companySelect')?.value;
-    const name = document.getElementById('companyName').value.trim();
-    const industry = document.getElementById('companyIndustry').value.trim();
-    const size = document.getElementById('companySize').value.trim();
-    const website = document.getElementById('companyWebsite').value.trim();
-    const location = document.getElementById('companyLocation').value.trim();
+    const companyId  = document.getElementById('companySelect')?.value;
+    const name       = document.getElementById('companyName').value.trim();
+    const industry   = document.getElementById('companyIndustry').value.trim();
+    const size       = document.getElementById('companySize').value.trim();
+    const website    = document.getElementById('companyWebsite').value.trim();
+    const location   = document.getElementById('companyLocation').value.trim();
     const description = document.getElementById('companyDescription').value.trim();
+    const logoFile   = document.getElementById('companyLogoFile')?.files[0];
 
     if (!name) {
         showToast('El nombre de la empresa es obligatorio.', true);
         return;
     }
 
-    const payload = {
-        owner_id: currentUser.id,
-        name,
-        logo: null,
-        industry: industry || null,
-        size: size || null,
-        website: website || null,
-        description: description || null,
-        location: location || null
-    };
+    // Usar FormData para poder enviar el logo junto con los campos de texto
+    const formData = new FormData();
+    formData.append('owner_id',    currentUser.id);
+    formData.append('name',        name);
+    if (industry)   formData.append('industry',   industry);
+    if (size)       formData.append('size',        size);
+    if (website)    formData.append('website',     website);
+    if (description) formData.append('description', description);
+    if (location)   formData.append('location',   location);
+
+    // "company_logo" es el nombre de campo que espera uploadLogo en el backend
+    if (logoFile) formData.append('company_logo', logoFile);
 
     try {
-        const url = companyId ? `${API}/api/companies/${companyId}` : `${API}/api/companies`;
+        const url    = companyId ? `${API}/api/companies/${companyId}` : `${API}/api/companies`;
         const method = companyId ? 'PUT' : 'POST';
+
         const res = await fetch(url, {
             method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            // No establecer Content-Type — el navegador lo pone automáticamente con el boundary
+            body: companyId ? formData : JSON.stringify({
+                owner_id: currentUser.id, name,
+                industry: industry || null, size: size || null,
+                website: website || null, description: description || null,
+                location: location || null, logo: null
+            }),
+            // POST sin logo usa JSON porque insertCompany no necesita multer
+            headers: companyId ? {} : { 'Content-Type': 'application/json' }
         });
 
         if (!res.ok) {
             const data = await res.json().catch(() => ({}));
             showToast(data.error || 'No se pudo guardar la empresa.', true);
             return;
+        }
+
+        const result = await res.json();
+
+        // Actualizar logo en sidebar si la empresa devuelve logo_url
+        if (result.empresa?.logo_url) {
+            const logoImg = document.getElementById('sidebarCompanyLogo');
+            if (logoImg) {
+                logoImg.src           = result.empresa.logo_url;
+                logoImg.style.display = 'block';
+            }
         }
 
         showToast(companyId ? 'Empresa actualizada correctamente' : 'Empresa registrada correctamente');
@@ -672,6 +705,22 @@ async function saveCompanyProfile() {
         console.error(err);
         showToast('Error de conexión al guardar la empresa.', true);
     }
+}
+
+// Vista previa del logo antes de subir
+function previewCompanyLogo() {
+    const file    = document.getElementById('companyLogoFile')?.files[0];
+    const img     = document.getElementById('companyLogoPreview');
+    const wrap    = document.getElementById('companyLogoPreviewWrap');
+    if (!file || !img) return;
+
+    const reader  = new FileReader();
+    reader.onload = (e) => {
+        img.src           = e.target.result;
+        img.style.display = 'block';
+        wrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
 }
 
 function createNewCompany() {
@@ -696,6 +745,12 @@ function showSection(id, el) {
     if (id === 'vacantes') loadMyJobs();
     if (id === 'postulantes') loadJobSelector();
     if (id === 'perfil') loadProfile();
+}
+
+// Navega a una sección buscando el botón del sidebar correspondiente
+function navTo(id) {
+    const btn = document.querySelector(`.nav-link-sb[onclick*="'${id}'"]`);
+    showSection(id, btn || null);
 }
 
 function toggleSidebar() {
@@ -728,8 +783,6 @@ async function loadDashboard() {
         }
 
         document.getElementById('metricApps').textContent = totalApps;
-        document.getElementById('metricAccepted').textContent = accepted;
-        document.getElementById('metricPending').textContent = pending;
 
         const tbody = document.getElementById('recentAppsBody');
         const sorted = recentApps.sort((a, b) => new Date(b.applied_at) - new Date(a.applied_at)).slice(0, 8);
@@ -911,15 +964,25 @@ async function changeAppStatus(appId, status) {
 
 async function viewCandidate(id) {
     try {
-        const users = await fetch(`${API}/api/users`).then(r => r.json());
-        const u = users.find(x => x.id === id);
-        if (!u) { showToast('Candidato no encontrado', true); return; }
+        // Llama directo por ID — no carga todos los usuarios
+        const res = await fetch(`${API}/api/users/${id}`);
+        if (!res.ok) { showToast('Candidato no encontrado', true); return; }
+        const u = await res.json();
 
-        const ini = `${u.first_name[0]}${u.last_name[0]}`.toUpperCase();
+        const avatar = u.profile_photo_url
+            ? `<img src="${u.profile_photo_url}" alt="Foto"
+                    style="width:56px;height:56px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+            : `<div class="user-avatar-sb" style="width:56px;height:56px;font-size:20px">
+                   ${u.first_name[0]}${u.last_name[0]}
+               </div>`;
+
         document.getElementById('candidateModalBody').innerHTML = `
             <div class="d-flex align-items-center gap-3 mb-4">
-                <div class="user-avatar-sb" style="width:56px;height:56px;font-size:20px">${ini}</div>
-                <div><h5 style="font-weight:700;margin:0">${u.first_name} ${u.last_name}</h5><p class="mb-0" style="color:#888;font-size:13px">Candidato</p></div>
+                ${avatar}
+                <div>
+                    <h5 style="font-weight:700;margin:0">${u.first_name} ${u.last_name}</h5>
+                    <p class="mb-0" style="color:#888;font-size:13px">Candidato</p>
+                </div>
             </div>
             <div class="row g-3">
                 <div class="col-md-6"><label class="tb-label">Correo</label><p>${u.email}</p></div>
@@ -937,9 +1000,9 @@ async function viewCandidate(id) {
 async function loadProfile() {
     if (!currentUser) return;
     try {
-        const users = await fetch(`${API}/api/users`).then(r => r.json());
-        const u = users.find(x => x.id === currentUser.id);
-        if (!u) return;
+        const res = await fetch(`${API}/api/users/${currentUser.id}`);
+        if (!res.ok) return;
+        const u = await res.json();
         document.getElementById('profFirstName').value = u.first_name || '';
         document.getElementById('profLastName').value = u.last_name || '';
         document.getElementById('profEmail').value = u.email || '';
@@ -956,33 +1019,50 @@ async function loadProfile() {
 
 async function saveProfile() {
     try {
-        const formData = new FormData();
-        formData.append('first_name', document.getElementById('profFirstName').value);
-        formData.append('last_name', document.getElementById('profLastName').value);
-        formData.append('email', currentUser.email);
-        formData.append('role', 'employer');
-        formData.append('phone', document.getElementById('profPhone').value);
-        formData.append('location', document.getElementById('profLocation').value);
-        formData.append('bio', document.getElementById('profBio').value);
-        formData.append('status', 'active');
-        const file = document.getElementById('profPhotoFile').files[0];
-        if (file) {
-            formData.append('profile_photo', file);
-        }
-
+        // 1️⃣ Guardar datos de texto (JSON)
         const res = await fetch(`${API}/api/users/${currentUser.id}`, {
             method: 'PUT',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                first_name:        document.getElementById('profFirstName').value,
+                last_name:         document.getElementById('profLastName').value,
+                email:             currentUser.email,
+                role:              'employer',
+                phone:             document.getElementById('profPhone').value,
+                location:          document.getElementById('profLocation').value,
+                bio:               document.getElementById('profBio').value,
+                status:            'active',
+                profile_photo_url: currentUser.profile_photo_url || null
+            })
         });
         if (!res.ok) { showToast('Error al guardar', true); return; }
         const updated = await res.json();
-        showToast('Perfil actualizado');
-        currentUser.first_name = document.getElementById('profFirstName').value;
-        currentUser.last_name = document.getElementById('profLastName').value;
+
+        currentUser.first_name        = document.getElementById('profFirstName').value;
+        currentUser.last_name         = document.getElementById('profLastName').value;
         currentUser.profile_photo_url = updated.usuario.profile_photo_url;
+
+        // 2️⃣ Si hay foto nueva, subirla a Cloudinary via /avatar
+        const file = document.getElementById('profPhotoFile').files[0];
+        if (file) {
+            const fd = new FormData();
+            fd.append('profile_photo', file); // debe coincidir con uploadPhoto.single('profile_photo')
+            const photoRes = await fetch(`${API}/api/users/${currentUser.id}/avatar`, {
+                method: 'PATCH',
+                body: fd
+            });
+            if (photoRes.ok) {
+                const photoData = await photoRes.json();
+                currentUser.profile_photo_url = photoData.profile_photo_url;
+            } else {
+                showToast('Perfil guardado, pero hubo un error al subir la foto', true);
+            }
+        }
+
         sessionStorage.setItem('employerUser', JSON.stringify(currentUser));
         setUserUI();
         updateProfilePhotoPreview(currentUser.profile_photo_url);
+        showToast('Perfil actualizado correctamente');
     } catch(e) { showToast('Error de conexión', true); }
 }
 
