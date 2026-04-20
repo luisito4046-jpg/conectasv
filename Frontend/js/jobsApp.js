@@ -327,6 +327,15 @@ window.performSearch = function () {
     const exp = document.getElementById('filterExp')?.value || '';
     const area = document.getElementById('filterArea')?.value || '';
 
+    const areaMap = {
+        tech: 'Tecnología',
+        marketing: 'Marketing',
+        finance: 'Finanzas',
+        health: 'Salud',
+        education: 'Educación',
+        sales: 'Ventas'
+    };
+
     let filtered = allJobs.filter(j => j.status === 'active');
 
     if (term) {
@@ -347,7 +356,8 @@ window.performSearch = function () {
         filtered = filtered.filter(j => j.level === exp);
     }
     if (area) {
-        filtered = filtered.filter(j => j.area === area);
+        const expectedArea = areaMap[area] || area;
+        filtered = filtered.filter(j => (j.area || '').toLowerCase() === expectedArea.toLowerCase());
     }
     if (salary) {
         filtered = filtered.filter(j => {

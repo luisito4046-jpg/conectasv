@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { uploadLogo } from '../middleware/upload.js';
 import {
     getAllCompanies,
     getCompanyById,
@@ -26,8 +27,9 @@ router.get('/:id', getCompanyById);
 // CREAR UNA NUEVA EMPRESA
 router.post('/', postCrearEmpresa);
 
-// ACTUALIZAR EMPRESA
-router.put('/:id', actualizarEmpresa);
+// ACTUALIZAR EMPRESA — uploadLogo procesa multipart/form-data
+// El campo del archivo debe llamarse "company_logo"
+router.put('/:id', uploadLogo, actualizarEmpresa);
 
 // ELIMINAR EMPRESA
 router.delete('/:id', eliminarEmpresa);

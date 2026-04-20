@@ -7,6 +7,7 @@ import {
     updateCompany,
     deleteCompany,
 } from '../services/companies.service.js';
+import { uploadToCloudinary } from '../middleware/upload.js';
 
 export const getAllCompanies = async (req, res) => {
     try {
@@ -51,12 +52,26 @@ export const postCrearEmpresa = async (req, res) => {
     }
 };
 
+// PUT /api/companies/:id
+// Soporta multipart/form-data con campo "company_logo" para subir logo a Cloudinary.
+// Si no viene archivo, actualiza solo los campos de texto (igual que users).
 export const actualizarEmpresa = async (req, res) => {
     try {
-        const company = await updateCompany(req.params.id, req.body);
+        const companyData = { ...req.body };
+
+        // Si se subió un logo, subirlo a Cloudinary y guardar la URL en logo_url
+        if (req.file) {
+            const publicId = `company_${req.params.id}_${Date.now()}`;
+            const result   = await uploadToCloudinary(req.file.buffer, publicId, 'conectasv/logos');
+            companyData.logo_url = result.secure_url;
+        }
+
+        const company = await updateCompany(req.params.id, companyData);
         if (!company) return res.status(404).json({ message: 'Empresa no encontrada' });
+
         res.status(200).json({ message: 'Empresa actualizada correctamente', empresa: company });
     } catch (err) {
+        console.error('ERROR actualizarEmpresa:', err);
         res.status(500).json({ error: err.message });
     }
 };

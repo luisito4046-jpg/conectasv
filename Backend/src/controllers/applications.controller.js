@@ -1,4 +1,5 @@
 import {
+    findAllApplications,
     findApplicationsByJob,
     findApplicationsByCandidate,
     findExistingApplication,
@@ -7,6 +8,15 @@ import {
     findApplicationById,
     removeApplication,
 } from '../services/applications.service.js';
+
+export const getAllApplications = async (req, res) => {
+    try {
+        const applications = await findAllApplications();
+        res.json(applications);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
 export const getApplicationsByJob = async (req, res) => {
     try {
