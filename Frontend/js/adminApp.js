@@ -324,6 +324,7 @@ function renderCompaniesTable() {
           <td class="text-end" style="font-size:12px;white-space:nowrap">
             ${!c.verified ? `<button class="btn btn-sm tb-btn-success" onclick="verifyCompany(${c.id})">Verificar</button>` : ''}
             <button class="btn btn-sm btn-icon" onclick="editCompany(${c.id})"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-icon danger" onclick="deleteCompany(${c.id})"><i class="bi bi-trash"></i></button>
           </td>
         </tr>`;
     }).join('');
@@ -346,6 +347,29 @@ async function verifyCompany(id) {
     } catch (err) {
         console.error('Error verifyCompany:', err);
         showToast('Error al verificar empresa', true);
+    }
+}
+
+async function deleteCompany(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta empresa? Esta acción no se puede deshacer.')) return;
+    
+    try {
+        const res = await fetch(`${API}/api/companies/${id}`, { method: 'DELETE' });
+        
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => null);
+            const msg = errorData?.error || 'Error desconocido';
+            showToast(`Error al eliminar empresa: ${msg}`, true);
+            return;
+        }
+        
+        // Remover de la lista local
+        allCompanies = allCompanies.filter(c => c.id !== id);
+        renderCompaniesTable();
+        showToast('Empresa eliminada correctamente');
+    } catch (err) {
+        console.error('Error deleteCompany:', err);
+        showToast('Error al eliminar empresa: sin conexión', true);
     }
 }
 
