@@ -4,7 +4,7 @@ import { pool } from '../config/db.js';
 const JOB_SELECT_FULL = `
     SELECT j.*,
            c.name     AS company_name,
-           c.logo     AS company_logo,
+           c.logo_url AS company_logo,
            c.industry AS company_industry,
            c.verified AS company_verified,
            c.location AS company_location,
@@ -19,7 +19,7 @@ export const findAllJobs = async () => {
     const result = await pool.query(`
         SELECT j.*,
                c.name     AS company_name,
-               c.logo     AS company_logo,
+               c.logo_url AS company_logo,
                c.industry AS company_industry,
                c.verified AS company_verified,
                c.location AS company_location,
@@ -47,7 +47,7 @@ export const findJobsByEmployer = async (employerId) => {
     const result = await pool.query(
         `SELECT j.*,
                 c.name AS company_name,
-                c.logo AS company_logo,
+                c.logo_url AS company_logo,
                 (SELECT COUNT(*) FROM applications a WHERE a.job_id = j.id) AS applications_count
          FROM jobs j
          JOIN companies c ON c.id = j.company_id

@@ -613,7 +613,6 @@ async function applyToJob(jobId) {
         if (!res.ok) throw new Error('Error al postular');
         
         showToast('¡Postulación enviada exitosamente!');
-        // Opcional: actualizar métricas si las tuviéramos
     } catch (err) {
         console.error('Error:', err);
         showToast('Error al enviar postulación', true);
@@ -847,14 +846,12 @@ async function loadProfile() {
         currentUser.profile_photo_url = u.profile_photo_url || null;
         sessionStorage.setItem('candidateUser', JSON.stringify(currentUser));
         setUserUI();
-        // Skills: stored as JSON array
         try {
             const skills = u.skills ? JSON.parse(u.skills) : [];
             document.getElementById('profSkills').value = skills.join(', ');
         } catch(e) {
             document.getElementById('profSkills').value = u.skills || '';
         }
-        // CV: mostrar bloque si ya tiene uno guardado
         if (u.cv_url) {
             currentUser.cv_url = u.cv_url;
             updateCvCurrentBlock(u.cv_url, u.cv_url.split('/').pop().split('?')[0]);
@@ -1001,7 +998,6 @@ function cvDrop(e) {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (!file) return;
-    // Reutilizar la misma validación
     const input = document.getElementById('profCvFile');
     const dt = new DataTransfer();
     dt.items.add(file);
@@ -1036,7 +1032,6 @@ async function uploadCV() {
         currentUser.cv_url = data.cv_url;
         sessionStorage.setItem('candidateUser', JSON.stringify(currentUser));
 
-        // Actualizar la vista del CV actual
         updateCvCurrentBlock(data.cv_url, file.name);
         clearCvSelection();
         showToast('CV subido correctamente ✓');

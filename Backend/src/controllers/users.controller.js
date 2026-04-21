@@ -99,7 +99,7 @@ export const actualizarFotoPerfil = async (req, res) => {
     }
 };
 
-// ✅ NUEVO: Sube CV en PDF a Cloudinary y guarda la URL en la base de datos
+// NUEVO: Sube CV en PDF a Cloudinary y guarda la URL en la base de datos
 export const actualizarCV = async (req, res) => {
     try {
         if (!req.file) {

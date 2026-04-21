@@ -38,7 +38,6 @@ const forumCatStyle = `
   }
 `;
 
-// Inyectar estilos una sola vez
 if (!document.getElementById('forumStyles')) {
     const style = document.createElement('style');
     style.id = 'forumStyles';
@@ -67,7 +66,6 @@ function updateForumUI() {
     const newPost    = document.getElementById('forumNewPost');
     const loginPrompt = document.getElementById('forumLoginPrompt');
 
-    // currentUser viene de indexApp.js
     if (typeof currentUser !== 'undefined' && currentUser) {
         newPost.style.display     = 'block';
         loginPrompt.style.display = 'none';
@@ -222,7 +220,6 @@ async function submitForumPost() {
 
         if (!res.ok) throw new Error('Error al publicar');
 
-        // Limpiar formulario y recargar
         document.getElementById('newPostTitle').value   = '';
         document.getElementById('newPostContent').value = '';
         await loadForumPosts();
@@ -248,17 +245,14 @@ async function submitReply(postId) {
         if (!res.ok) throw new Error('Error al responder');
 
         input.value = '';
-        await toggleReplies(postId); // cerrar
-        await toggleReplies(postId); // reabrir con datos frescos
-        await loadForumPosts();      // actualizar contador
+        await toggleReplies(postId); 
+        await toggleReplies(postId); 
+        await loadForumPosts();      
 
     } catch (err) {
         alert('Error al enviar la respuesta.');
     }
 }
-
-// ── Hook: cargar foro al mostrar la vista ────────────────────
-// Se integra con el showView() que ya existe en indexApp.js
 const _origShowView = window.showView;
 window.showView = function(view) {
     if (_origShowView) _origShowView(view);
