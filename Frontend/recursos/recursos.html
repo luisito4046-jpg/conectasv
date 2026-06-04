@@ -54,7 +54,7 @@
     .res-stat-lbl{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
 
     /* ── TABS de categorías ── */
-    .res-tabs-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:50}
+    .res-tabs-wrap{background:var(--surface);border-bottom:1px solid var(--border);z-index:50;box-shadow:0 10px 28px rgba(0,0,0,.08)}
     .res-tabs{display:flex;gap:4px;padding:0 0;overflow-x:auto;scrollbar-width:none}
     .res-tabs::-webkit-scrollbar{display:none}
     .res-tab{display:flex;align-items:center;gap:7px;padding:16px 20px;font-size:13px;font-weight:600;color:var(--text-m);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all var(--transition)}
@@ -67,7 +67,7 @@
     @media(max-width:991px){.res-layout{grid-template-columns:1fr}}
 
     /* ── SIDEBAR FILTROS ── */
-    .res-sidebar{position:sticky;top:110px}
+    .res-sidebar{position:static;top:auto;}
     .res-sidebar-card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
     .res-sidebar-title{font-family:var(--font-body);font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
     .res-filter-btn{display:flex;align-items:center;gap:9px;width:100%;border:none;background:none;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text-m);cursor:pointer;transition:all var(--transition);text-align:left}
@@ -170,7 +170,7 @@
       <ul class="navbar-nav me-auto ms-4 gap-1">
         <li class="nav-item"><a class="nav-link tb-nav-link" href="../index.html"><i class="bi bi-house me-1"></i>Inicio</a></li>
         <li class="nav-item"><a class="nav-link tb-nav-link" href="../index.html#jobs"><i class="bi bi-search me-1"></i>Explorar Empleos</a></li>
-        <li class="nav-item"><a class="nav-link tb-nav-link" href="../index.html#forum"><i class="bi bi-chat-dots me-1"></i>Foro</a></li>
+        <li class="nav-item"><a class="nav-link tb-nav-link" href="/forum"><i class="bi bi-chat-dots me-1"></i>Foro</a></li>
         <li class="nav-item"><a class="nav-link tb-nav-link active" href="recursos.html"><i class="bi bi-journal-bookmark me-1"></i>Recursos</a></li>
       </ul>
       <!-- Sin sesión activa -->

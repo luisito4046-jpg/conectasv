@@ -1,5 +1,49 @@
 import { pool } from '../config/db.js';
+import { findCompaniesByOwner, insertCompany } from './companies.service.js';
 
+/** Normaliza tipos enviados por el frontend (full, Full-time, etc.) */
+export const normalizeJobType = (type) => {
+    if (!type) return 'full-time';
+    const map = {
+        full: 'full-time',
+        'full-time': 'full-time',
+        part: 'part-time',
+        'part-time': 'part-time',
+        remote: 'remote',
+        contract: 'contract',
+        freelance: 'freelance',
+    };
+    return map[String(type).toLowerCase()] ?? type;
+};
+
+/** Para filtros/UI: acepta full-time y full como equivalentes */
+export const jobTypeMatchesFilter = (dbType, filterId) => {
+    const n = normalizeJobType(dbType);
+    const f = normalizeJobType(filterId);
+    return n === f;
+};
+
+async function resolveCompanyForEmployer(employerId, companyName) {
+    const companies = await findCompaniesByOwner(employerId);
+    if (companies.length > 0) return companies[0];
+
+    const name = (companyName || 'Mi Empresa').trim() || 'Mi Empresa';
+    try {
+        return await insertCompany({
+            owner_id: employerId,
+            name,
+            description: '',
+            industry: '',
+            location: '',
+        });
+    } catch (err) {
+        if (err.code === 'COMPANY_ALREADY_EXISTS') {
+            const again = await findCompaniesByOwner(employerId);
+            if (again.length > 0) return again[0];
+        }
+        throw err;
+    }
+}
 
 const JOB_SELECT_FULL = `
     SELECT j.*,
@@ -61,27 +105,70 @@ export const findJobsByEmployer = async (employerId) => {
 export const insertJob = async (data) => {
     const {
         company_id, posted_by, title, area, type, level,
-        salary_min, salary_max, currency, location, remote,
-        requirements, description, benefits, contact, featured,
+        salary_min, salary_max, location,
+        requirements, description, contact,
     } = data;
 
     const result = await pool.query(
         `INSERT INTO jobs
              (company_id, posted_by, title, area, type, level,
-              salary_min, salary_max, currency, location, remote,
-              requirements, description, benefits, contact, featured)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+              salary_min, salary_max, location,
+              requirements, description, contact)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
          RETURNING *`,
         [
             company_id, posted_by, title,
-            area ?? null, type ?? 'full', level ?? 'mid',
-            salary_min ?? null, salary_max ?? null, currency ?? 'USD',
-            location ?? null, remote ?? false,
+            area    ?? null, normalizeJobType(type), level ?? 'mid',
+            salary_min ?? null, salary_max ?? null,
+            location   ?? null,
             requirements ?? null, description,
-            benefits ?? null, contact ?? null, featured ?? false,
+            contact ?? null,
         ]
     );
     return result.rows[0];
+};
+
+/** Crea empleo desde el body del frontend (employer_id, company_name, contact_email, …) */
+export const createJobFromPayload = async (body) => {
+    const employerId = body.employer_id ?? body.posted_by;
+    if (!employerId) {
+        const err = new Error('employer_id es requerido');
+        err.status = 400;
+        throw err;
+    }
+    if (!body.title?.trim() || !body.description?.trim()) {
+        const err = new Error('Título y descripción son requeridos');
+        err.status = 400;
+        throw err;
+    }
+
+    const contact = body.contact ?? body.contact_email;
+    if (!contact?.trim()) {
+        const err = new Error('Correo de contacto es requerido');
+        err.status = 400;
+        throw err;
+    }
+
+    const company = body.company_id
+        ? { id: body.company_id }
+        : await resolveCompanyForEmployer(employerId, body.company_name);
+
+    const row = await insertJob({
+        company_id: company.id,
+        posted_by: employerId,
+        title: body.title.trim(),
+        area: body.area ?? null,
+        type: body.type,
+        level: body.level ?? 'entry',
+        salary_min: body.salary_min ?? null,
+        salary_max: body.salary_max ?? null,
+        location: body.location?.trim() || null,
+        requirements: body.requirements?.trim() || null,
+        description: body.description.trim(),
+        contact: contact.trim(),
+    });
+
+    return findJobById(row.id);
 };
 
 export const patchJobStatus = async (id, status) => {
@@ -95,21 +182,19 @@ export const patchJobStatus = async (id, status) => {
 export const updateJob = async (id, data) => {
     const {
         title, area, type, level, salary_min, salary_max,
-        location, remote, requirements, description,
-        benefits, contact, status, featured,
+        location, requirements, description, contact, status,
     } = data;
 
     const result = await pool.query(
         `UPDATE jobs
          SET title=$1, area=$2, type=$3, level=$4, salary_min=$5, salary_max=$6,
-             location=$7, remote=$8, requirements=$9, description=$10,
-             benefits=$11, contact=$12, status=$13, featured=$14,
+             location=$7, requirements=$8, description=$9,
+             contact=$10, status=$11,
              updated_at=CURRENT_TIMESTAMP
-         WHERE id=$15
+         WHERE id=$12
          RETURNING *`,
         [title, area, type, level, salary_min, salary_max,
-         location, remote, requirements, description,
-         benefits, contact, status, featured, id]
+         location, requirements, description, contact, status, id]
     );
     return result.rows[0] ?? null;
 };

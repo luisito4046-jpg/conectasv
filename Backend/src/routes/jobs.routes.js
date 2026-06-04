@@ -9,11 +9,11 @@ const router = Router();
 // GET /api/jobs — todos los empleos
 router.get('/', getAllJobs);
 
+// GET /api/jobs/employer/:employerId — empleos del employer (antes de /:id)
+router.get('/employer/:employerId', getJobsByEmployer);
+
 // GET /api/jobs/:id — empleo por ID
 router.get('/:id', getJobById);
-
-// GET /api/jobs/employer/:employerId — empleos del employer (via companies.owner_id)
-router.get('/employer/:employerId', getJobsByEmployer);
 
 // POST /api/jobs — crear empleo
 router.post('/', createJob);

@@ -51,6 +51,10 @@ async function login() {
         closeLoginModal();
         updateNavbar(data);
 
+        // Toast de bienvenida post-login
+        const roleLabel = { candidate: 'Candidato', employer: 'Empleador', admin: 'Admin' }[data.role] || '';
+        showToastNotif(`¡Bienvenido, ${data.first_name}! 👋 Sesión iniciada correctamente.`);
+
         // Cargar datos relevantes según el rol
         if (data.role === 'employer' && typeof loadEmployerJobs === 'function') {
             loadEmployerJobs();
@@ -165,9 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedCandidate) {
         currentUser = JSON.parse(storedCandidate);
         updateNavbar(currentUser);
+        showToastNotif(`Sesión activa como ${currentUser.first_name} 👤`);
     } else if (storedEmployer) {
         currentUser = JSON.parse(storedEmployer);
         updateNavbar(currentUser);
+        showToastNotif(`Sesión activa como ${currentUser.first_name} 👤`);
     }
 
     // ── Indicador de fortaleza de contraseña ──────────────────

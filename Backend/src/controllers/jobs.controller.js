@@ -2,7 +2,7 @@ import {
     findAllJobs,
     findJobById,
     findJobsByEmployer,
-    insertJob,
+    createJobFromPayload,
     patchJobStatus,
     updateJob,
     deleteJob,
@@ -36,10 +36,14 @@ export const getJobsByEmployer = async (req, res) => {
 
 export const createJob = async (req, res) => {
     try {
-        const job = await insertJob(req.body);
+        const job = await createJobFromPayload(req.body);
         res.status(201).json(job);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        if (err.code === 'COMPANY_ALREADY_EXISTS') {
+            return res.status(409).json({ error: err.message });
+        }
+        const status = err.status || 500;
+        res.status(status).json({ error: err.message });
     }
 };
 

@@ -2,9 +2,9 @@ import { pool } from '../config/db.js';
 import bcrypt from 'bcrypt';
 
 const REDIRECTS = {
-    admin:     '/admin/admin.html',
-    employer:  '/Employee/employee.html',
-    candidate: '/Candidate/candidate.html',
+    admin:     '/',
+    employer:  '/employer',
+    candidate: '/',
 };
 
 /**
@@ -45,6 +45,6 @@ export const authenticateUser = async (email, password) => {
         email:             user.email,
         role:              user.role,
         profile_photo_url: user.profile_photo_url ?? null,
-        redirect:          REDIRECTS[user.role] ?? '/Candidate/candidate.html',
+        redirect:          REDIRECTS[user.role] ?? '/candidate.html',
     };
 };

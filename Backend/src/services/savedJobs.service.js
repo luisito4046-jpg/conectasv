@@ -3,7 +3,7 @@ import { pool } from '../config/db.js';
 export const findSavedJobsByUser = async (userId) => {
     const result = await pool.query(
         `SELECT sj.*, j.title, j.location, j.type, j.level, j.company_id,
-                c.name AS company_name, c.logo AS company_logo,
+                c.name AS company_name, c.logo_url AS company_logo,
                 j.description
          FROM saved_jobs sj
          JOIN jobs j ON sj.job_id = j.id

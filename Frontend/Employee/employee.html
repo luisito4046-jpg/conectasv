@@ -1683,7 +1683,7 @@
         const apps = await fetch(`${API}/api/applications/job/${jobId}`).then(r => r.json());
         if (apps.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3" style="color:#888">Sin postulantes</td></tr>'; return; }
 
-        const statusLabel = { pending: 'Pendiente', review: 'Revisado', interview: 'Entrevista', accepted: 'Aceptado', rejected: 'Rechazado' };
+        const statusLabel = { pending: 'Pendiente', review: 'Revisado', reviewed: 'Revisado', interview: 'Entrevista', accepted: 'Aceptado', rejected: 'Rechazado' };
 
         tbody.innerHTML = apps.map(a => {
           const ini = `${a.first_name[0]}${a.last_name[0]}`.toUpperCase();
@@ -1697,9 +1697,9 @@
                     <div class="dropdown">
                         <button class="btn btn-sm tb-btn-ghost dropdown-toggle" data-bs-toggle="dropdown" style="font-size:12px">Acción</button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item small" href="#" onclick="viewCandidate(${a.candidate_id});return false"><i class="bi bi-person me-2"></i>Ver Perfil</a></li>
+                            <li><a class="dropdown-item small" href="#" onclick="viewCandidate(${a.candidate_id || a.user_id});return false"><i class="bi bi-person me-2"></i>Ver Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item small" href="#" onclick="changeAppStatus(${a.id},'review');return false"><i class="bi bi-eye me-2"></i>Revisado</a></li>
+                            <li><a class="dropdown-item small" href="#" onclick="changeAppStatus(${a.id},'reviewed');return false"><i class="bi bi-eye me-2"></i>Revisado</a></li>
                             <li><a class="dropdown-item small" href="#" onclick="changeAppStatus(${a.id},'interview');return false"><i class="bi bi-calendar-event me-2"></i>Entrevista</a></li>
                             <li><a class="dropdown-item small text-success" href="#" onclick="changeAppStatus(${a.id},'accepted');return false"><i class="bi bi-check-circle me-2"></i>Aceptar</a></li>
                             <li><a class="dropdown-item small text-danger" href="#" onclick="changeAppStatus(${a.id},'rejected');return false"><i class="bi bi-x-circle me-2"></i>Rechazar</a></li>
