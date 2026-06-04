@@ -258,7 +258,6 @@ window.showJobDetail = async function (jobId) {
                 </p>
             </div>`;
 
-        // Si no hay sesión o no es candidato, deshabilitar botón
         if (!currentUser || currentUser.role !== 'candidate') {
             const btn = document.getElementById('btnApply');
             if (btn) {
@@ -304,7 +303,6 @@ window.applyToJob = async function (jobId) {
 
         showToastNotif('¡Te has postulado exitosamente!');
 
-        // Deshabilitar botón
         const btn = document.getElementById('btnApply');
         if (btn) {
             btn.disabled = true;
@@ -327,6 +325,15 @@ window.performSearch = function () {
     const exp = document.getElementById('filterExp')?.value || '';
     const area = document.getElementById('filterArea')?.value || '';
 
+    const areaMap = {
+        tech: 'Tecnología',
+        marketing: 'Marketing',
+        finance: 'Finanzas',
+        health: 'Salud',
+        education: 'Educación',
+        sales: 'Ventas'
+    };
+
     let filtered = allJobs.filter(j => j.status === 'active');
 
     if (term) {
@@ -347,7 +354,8 @@ window.performSearch = function () {
         filtered = filtered.filter(j => j.level === exp);
     }
     if (area) {
-        filtered = filtered.filter(j => j.area === area);
+        const expectedArea = areaMap[area] || area;
+        filtered = filtered.filter(j => (j.area || '').toLowerCase() === expectedArea.toLowerCase());
     }
     if (salary) {
         filtered = filtered.filter(j => {
@@ -372,11 +380,9 @@ window.quickSearch = function (term) {
 };
 
 window.applyFilters = function () {
-    // Lee checkboxes del sidebar de la vista jobs
-    const types = [...document.querySelectorAll('#view-jobs .tb-check-group:first-of-type input:checked')]
-        .map(cb => cb.value);
-    const levels = [...document.querySelectorAll('#view-jobs .tb-check-group:last-of-type input:checked')]
-        .map(cb => cb.value);
+    const groups = document.querySelectorAll('#view-jobs .tb-check-group');
+    const types = groups.length > 0 ? [...groups[0].querySelectorAll('input:checked')].map(cb => cb.value) : [];
+    const levels = groups.length > 1 ? [...groups[1].querySelectorAll('input:checked')].map(cb => cb.value) : [];
 
     let filtered = allJobs.filter(j => j.status === 'active');
 

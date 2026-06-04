@@ -9,7 +9,6 @@ async function login() {
     const password = document.getElementById('loginPassword').value;
     const errorEl  = document.getElementById('loginError');
 
-    // Limpiar error anterior
     errorEl.textContent = '';
     errorEl.style.display = 'none';
 
@@ -28,28 +27,33 @@ async function login() {
         const data = await res.json();
 
         if (!res.ok) {
-            // 401 credenciales, 403 suspendido, 500 servidor
             showLoginError(data.error || 'Error al iniciar sesión.');
             return;
         }
 
-        // ── Admin / Employer / Candidate → redirigir al panel ──────────
-        if (data.redirect) {
-            // Guardar datos del usuario para el panel destino
-            if (data.role === 'employer') {
-                sessionStorage.setItem('employerUser', JSON.stringify(data));
-            }
-            if (data.role === 'candidate') {
-                sessionStorage.setItem('candidateUser', JSON.stringify(data));
-            }
+        // ── Admin → redirigir a su panel ──────────────────────────────
+        if (data.redirect && data.role === 'admin') {
             window.location.href = data.redirect;
             return;
         }
 
-        // ── Candidate / Employer → actualizar navbar ─────────
+        // ── Employer → quedarse en home, guardar sesión y actualizar navbar ──
+        if (data.role === 'employer') {
+            sessionStorage.setItem('employerUser', JSON.stringify(data));
+        }
+
+        // ── Candidate → quedarse en home, guardar sesión y actualizar navbar ──
+        if (data.role === 'candidate') {
+            sessionStorage.setItem('candidateUser', JSON.stringify(data));
+        }
+
         currentUser = data;
         closeLoginModal();
         updateNavbar(data);
+
+        // Toast de bienvenida post-login
+        const roleLabel = { candidate: 'Candidato', employer: 'Empleador', admin: 'Admin' }[data.role] || '';
+        showToastNotif(`¡Bienvenido, ${data.first_name}! 👋 Sesión iniciada correctamente.`);
 
         // Cargar datos relevantes según el rol
         if (data.role === 'employer' && typeof loadEmployerJobs === 'function') {
@@ -75,7 +79,7 @@ async function register() {
     const role = activeBtn ? activeBtn.dataset.role : 'candidate';
 
     // Validaciones
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || (!lastName && role !== 'employer') || !email || !password) {
         showToastNotif('Por favor completa todos los campos.', 'error');
         return;
     }
@@ -120,7 +124,7 @@ async function register() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         owner_id: data.id,
-                        name: `${firstName} ${lastName}`,
+                        name: `${firstName} ${lastName}`.trim(),
                         description: '',
                         industry: '',
                         location: ''
@@ -157,6 +161,22 @@ async function register() {
 
 // ── INDICADOR DE FORTALEZA DE CONTRASEÑA ─────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ── Restaurar sesión activa al volver desde otro panel ────
+    const storedCandidate = sessionStorage.getItem('candidateUser');
+    const storedEmployer  = sessionStorage.getItem('employerUser');
+
+    if (storedCandidate) {
+        currentUser = JSON.parse(storedCandidate);
+        updateNavbar(currentUser);
+        showToastNotif(`Sesión activa como ${currentUser.first_name} 👤`);
+    } else if (storedEmployer) {
+        currentUser = JSON.parse(storedEmployer);
+        updateNavbar(currentUser);
+        showToastNotif(`Sesión activa como ${currentUser.first_name} 👤`);
+    }
+
+    // ── Indicador de fortaleza de contraseña ──────────────────
     const pwInput = document.getElementById('regPassword');
     if (pwInput) {
         pwInput.addEventListener('input', () => {
@@ -191,10 +211,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function logout() {
     currentUser = null;
+    sessionStorage.removeItem('candidateUser');
+    sessionStorage.removeItem('employerUser');
 
     // Restaurar controles de sesión
-    document.getElementById('authControls').style.display  = 'flex';
-    document.getElementById('userControls').style.display  = 'none';
+    document.getElementById('authControls').style.setProperty('display', 'flex', 'important');
+    document.getElementById('userControls').style.setProperty('display', 'none', 'important');
 
     // Ocultar nav items de rol
     document.getElementById('navCandidate').style.display = 'none';
@@ -224,15 +246,36 @@ function closeLoginModal() {
 }
 
 function updateNavbar(user) {
-    const initials = `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+    const avatarEl = document.getElementById('navAvatar');
 
-    document.getElementById('navAvatar').textContent   = initials;
-    document.getElementById('navUserName').textContent = `${user.first_name} ${user.last_name}`;
+    // ── Foto de perfil o iniciales ────────────────────────────
+    if (user.logo_url || user.profile_photo_url) {
+        avatarEl.innerHTML = '';
+        avatarEl.style.backgroundImage    = `url('${user.logo_url || user.profile_photo_url}')`;
+        avatarEl.style.backgroundSize     = 'cover';
+        avatarEl.style.backgroundPosition = 'center';
+        avatarEl.textContent = '';
+    } else {
+        avatarEl.style.backgroundImage = '';
+        const f = user.first_name ? user.first_name[0] : '';
+        const l = user.last_name ? user.last_name[0] : '';
+        avatarEl.textContent = `${f}${l}`.toUpperCase();
+    }
 
-    document.getElementById('authControls').style.display  = 'none';
-    document.getElementById('userControls').style.removeProperty('display');
+    const dName = user.last_name ? `${user.first_name} ${user.last_name}` : user.first_name;
+    document.getElementById('navUserName').textContent = dName;
 
-    // Mostrar solo el nav item del rol correspondiente
+    // ── El avatar lleva al panel correspondiente al rol ───────
+    const profileLink = document.getElementById('navProfileLink');
+    if (profileLink) {
+        profileLink.href = user.role === 'employer' ? '/employee.html' : '/candidate.html';
+    }
+
+    // ── Ocultar botones de sesión y mostrar controles de usuario ──
+    document.getElementById('authControls').style.setProperty('display', 'none', 'important');
+    document.getElementById('userControls').style.setProperty('display', 'flex', 'important');
+
+    // ── Mostrar el enlace de nav correspondiente al rol ───────
     document.getElementById('navCandidate').style.display =
         user.role === 'candidate' ? 'block' : 'none';
     document.getElementById('navEmployer').style.display  =

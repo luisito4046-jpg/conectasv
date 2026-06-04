@@ -108,6 +108,44 @@
     .job-card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--border);transition:all var(--transition)}
     .job-card:hover{border-color:var(--primary-l);box-shadow:0 4px 12px rgba(26,58,92,.08)}
 
+    /* ── Ratings / Stars ── */
+    .stars-display{display:flex;gap:2px}
+    .star-icon{font-size:16px;color:#e2ddd6;transition:color var(--transition)}
+    .star-icon.filled{color:#f59e0b}
+    .stars-input{display:flex;gap:4px;flex-direction:row-reverse;justify-content:flex-end}
+    .stars-input input{display:none}
+    .stars-input label{font-size:26px;color:#e2ddd6;cursor:pointer;transition:color .15s}
+    .stars-input input:checked ~ label,
+    .stars-input label:hover,
+    .stars-input label:hover ~ label{color:#f59e0b}
+
+    /* ── Company Rating Card ── */
+    .company-rating-card{background:var(--surface);border-radius:var(--radius-lg);padding:20px;border:1px solid var(--border);box-shadow:var(--shadow);transition:all var(--transition);display:flex;flex-direction:column;gap:12px}
+    .company-rating-card:hover{border-color:var(--primary-l);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+    .company-logo-badge{width:52px;height:52px;border-radius:12px;background:rgba(26,58,92,.08);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent);flex-shrink:0}
+    .avg-rating-big{font-size:2rem;font-family:var(--font-title);color:var(--primary);line-height:1}
+
+    /* ── Rating Modal ── */
+    #ratingModal .modal-content{border-radius:var(--radius-lg);border:none;box-shadow:var(--shadow-lg)}
+    #ratingModal .modal-header{border-bottom:1px solid var(--border);padding:20px 24px}
+    #ratingModal .modal-body{padding:24px}
+    #ratingModal .modal-footer{border-top:1px solid var(--border);padding:16px 24px}
+
+    /* ── Toast mejorado ── */
+    .sv-toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .sv-toast{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:14px;color:#fff;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.22);pointer-events:all;animation:toastIn .3s cubic-bezier(.4,0,.2,1);min-width:280px;max-width:380px}
+    .sv-toast.removing{animation:toastOut .3s cubic-bezier(.4,0,.2,1) forwards}
+    .sv-toast-success{background:linear-gradient(135deg,#16a34a,#15803d)}
+    .sv-toast-error{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+    .sv-toast-warning{background:linear-gradient(135deg,#d97706,#b45309)}
+    .sv-toast-info{background:linear-gradient(135deg,#1a3a5c,#2a5f9e)}
+    .sv-toast i{font-size:18px;flex-shrink:0}
+    .sv-toast span{flex:1;line-height:1.4}
+    .sv-toast-close{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:16px;padding:0;line-height:1;flex-shrink:0}
+    .sv-toast-close:hover{color:#fff}
+    @keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes toastOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(20px) scale(.96)}}
+
     @media(max-width:991px){
       .admin-sidebar{transform:translateX(-100%)}
       .admin-sidebar.open{transform:translateX(0)}
@@ -122,7 +160,7 @@
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <aside class="admin-sidebar" id="adminSidebar">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" style="cursor:pointer" onclick="window.location.href='index.html'" title="Volver al inicio">
     <div class="brand-icon"><i class="bi bi-briefcase-fill" style="color:#4d9cf8;font-size:18px"></i></div>
     <span class="brand-text">Conecta<strong class="brand-sv">SV</strong></span>
   </div>
@@ -131,6 +169,7 @@
   <button class="nav-link-sb" onclick="showSection('postulaciones',this)"><i class="bi bi-send-fill"></i>Mis Postulaciones</button>
   <button class="nav-link-sb" onclick="showSection('guardados',this)"><i class="bi bi-bookmark-fill"></i>Empleos Guardados</button>
   <button class="nav-link-sb" onclick="showSection('alertas',this)"><i class="bi bi-bell-fill"></i>Mis Alertas</button>
+  <button class="nav-link-sb" onclick="showSection('empresas',this)"><i class="bi bi-star-fill"></i>Calificar Empresas</button>
   <div class="sidebar-section-label">Configuración</div>
   <button class="nav-link-sb" onclick="showSection('perfil',this)"><i class="bi bi-person-gear"></i>Mi Perfil</button>
   <div class="sidebar-footer">
@@ -308,6 +347,59 @@
             <button class="btn tb-btn-primary mt-3" onclick="saveProfile()"><i class="bi bi-check-circle me-2"></i>Guardar Cambios</button>
           </div>
         </div>
+
+        <!-- ── CV / Hoja de vida ── -->
+        <div class="col-12 col-lg-8">
+          <div class="data-card">
+            <div class="data-card-header">
+              <span class="data-card-title"><i class="bi bi-file-earmark-pdf"></i>Currículum Vitae (PDF)</span>
+            </div>
+
+            <!-- Vista previa del CV actual -->
+            <div id="cvCurrentBlock" style="display:none;margin-bottom:16px;">
+              <label class="tb-label">CV actual</label>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(26,58,92,.04);border:1px solid var(--border);border-radius:var(--radius);">
+                <i class="bi bi-file-earmark-pdf-fill" style="font-size:22px;color:#dc2626;flex-shrink:0"></i>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="cvFileName">curriculum.pdf</div>
+                  <div style="font-size:11px;color:var(--text-m)">Subido anteriormente</div>
+                </div>
+                <a id="cvViewLink" href="#" target="_blank" class="btn tb-btn-ghost" style="font-size:12px;padding:4px 12px;">
+                  <i class="bi bi-eye me-1"></i>Ver
+                </a>
+              </div>
+            </div>
+
+            <!-- Input para subir nuevo CV -->
+            <label class="tb-label">Subir nuevo CV <span style="color:var(--text-l);font-weight:400">(PDF, máx. 5 MB)</span></label>
+            <div id="cvDropZone" style="border:2px dashed var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all var(--transition);background:rgba(255,255,255,.6);"
+                 onclick="document.getElementById('profCvFile').click()"
+                 ondragover="cvDragOver(event)" ondragleave="cvDragLeave(event)" ondrop="cvDrop(event)">
+              <i class="bi bi-cloud-arrow-up" style="font-size:2rem;color:var(--primary-l);opacity:.5;display:block;margin-bottom:8px"></i>
+              <div style="font-size:13px;font-weight:600;color:var(--primary)">Haz clic o arrastra tu PDF aquí</div>
+              <div style="font-size:12px;color:var(--text-l);margin-top:4px">Solo archivos .pdf</div>
+            </div>
+            <input type="file" id="profCvFile" accept=".pdf,application/pdf" style="display:none" onchange="onCvFileSelected(this)"/>
+
+            <!-- Preview del archivo seleccionado -->
+            <div id="cvSelectedPreview" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.2);border-radius:var(--radius);display:none;align-items:center;gap:10px;">
+              <i class="bi bi-file-earmark-check-fill" style="font-size:20px;color:var(--success);flex-shrink:0"></i>
+              <div style="flex:1;min-width:0">
+                <div id="cvSelectedName" style="font-size:13px;font-weight:600;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+                <div id="cvSelectedSize" style="font-size:11px;color:var(--text-m)"></div>
+              </div>
+              <button class="btn tb-btn-danger" onclick="clearCvSelection()" style="font-size:12px;padding:4px 10px;flex-shrink:0">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+
+            <!-- Botón subir -->
+            <button class="btn tb-btn-primary mt-3" id="cvUploadBtn" onclick="uploadCV()" style="display:none">
+              <i class="bi bi-cloud-arrow-up me-2"></i>Subir CV
+            </button>
+          </div>
+          </div>
+        </div>
         <div class="col-lg-4">
           <div class="data-card">
             <div class="data-card-header"><span class="data-card-title"><i class="bi bi-lightbulb"></i>Consejos</span></div>
@@ -315,9 +407,29 @@
               <li class="mb-2">Completa tu perfil para que las empresas te encuentren más fácil.</li>
               <li class="mb-2">Agrega todas tus habilidades para mejorar tu visibilidad.</li>
               <li class="mb-2">Un buen resumen profesional aumenta tus posibilidades.</li>
-              <li>Mantén tu teléfono actualizado para que te contacten.</li>
+              <li class="mb-2">Mantén tu teléfono actualizado para que te contacten.</li>
+              <li><strong style="color:var(--primary)">Sube tu CV en PDF</strong> para que los empleadores puedan descargarlo directamente.</li>
             </ul>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ CALIFICAR EMPRESAS ══════════ -->
+    <section id="sec-empresas" style="display:none">
+      <div class="section-title"><i class="bi bi-star-fill me-1" style="color:#f59e0b"></i>Calificar Empresas</div>
+
+      <div class="data-card mb-4" style="background:linear-gradient(135deg,rgba(26,58,92,.04),rgba(232,148,58,.04));border:1px solid rgba(232,148,58,.15)">
+        <div style="display:flex;align-items:center;gap:12px">
+          <i class="bi bi-info-circle" style="color:var(--accent);font-size:20px;flex-shrink:0"></i>
+          <p style="margin:0;font-size:13px;color:var(--text-m)">Tu opinión ayuda a otros candidatos a tomar mejores decisiones. Califica empresas donde hayas postulado o trabajado.</p>
+        </div>
+      </div>
+
+      <div id="companiesGrid" class="row g-3">
+        <div class="col-12 text-center py-4">
+          <i class="bi bi-arrow-clockwise" style="font-size:2rem;opacity:.3"></i>
+          <p class="mt-2" style="color:#888">Cargando empresas...</p>
         </div>
       </div>
     </section>
@@ -325,8 +437,49 @@
   </main>
 </div>
 
-<!-- Toast -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+<!-- Modal de Calificación -->
+<div class="modal fade" id="ratingModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ratingModalTitle" style="font-family:var(--font-title);font-size:1.15rem;color:var(--primary)">Calificar empresa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="ratingCompanyId">
+        <!-- Estrellas interactivas -->
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:13px;color:var(--text-m);margin-bottom:10px">Selecciona una puntuación del 1 al 5</div>
+          <div class="stars-input" id="starsInput">
+            <input type="radio" id="s5" name="star" value="5"><label for="s5" title="5 estrellas"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="s4" name="star" value="4"><label for="s4" title="4 estrellas"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="s3" name="star" value="3"><label for="s3" title="3 estrellas"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="s2" name="star" value="2"><label for="s2" title="2 estrellas"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="s1" name="star" value="1"><label for="s1" title="1 estrella"><i class="bi bi-star-fill"></i></label>
+          </div>
+          <div id="starLabel" style="font-size:13px;color:var(--accent);font-weight:600;margin-top:8px;min-height:20px"></div>
+        </div>
+        <!-- Comentario -->
+        <div>
+          <label class="tb-label">Comentario <span style="color:var(--text-l);font-weight:400">(opcional)</span></label>
+          <textarea class="form-control tb-input" id="ratingComment" rows="4" placeholder="Comparte tu experiencia con esta empresa..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn tb-btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn tb-btn-primary" id="ratingSubmitBtn" onclick="submitRating()">
+          <i class="bi bi-star-fill me-2"></i>Guardar Calificación
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container personalizado -->
+<div class="sv-toast-wrap" id="svToastWrap"></div>
+
+<!-- Toast Bootstrap legacy (lo mantenemos por compatibilidad) -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9990;display:none">
   <div id="toastEl" class="toast tb-toast align-items-center" role="alert">
     <div class="d-flex align-items-center gap-2 p-3">
       <i class="bi bi-check-circle-fill" id="toastIcon" style="font-size:16px"></i>
@@ -357,8 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = JSON.parse(stored);
         setUserUI();
         loadDashboard();
+        setTimeout(() => showToast(`¡Bienvenido de nuevo, ${currentUser.first_name}! 👋`), 600);
     } else {
-        showToast('No hay sesión activa. Redirigiendo…', true);
+        showToast('No hay sesión activa. Redirigiendo…', 'error');
         setTimeout(() => { window.location.href = '/'; }, 1500);
     }
 });
@@ -384,7 +538,7 @@ function setUserUI() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────
-const TITLES = { dashboard:'Empleos Disponibles', postulaciones:'Mis Postulaciones', guardados:'Empleos Guardados', alertas:'Mis Alertas', perfil:'Mi Perfil' };
+const TITLES = { dashboard:'Empleos Disponibles', postulaciones:'Mis Postulaciones', guardados:'Empleos Guardados', alertas:'Mis Alertas', empresas:'Calificar Empresas', perfil:'Mi Perfil' };
 
 function showSection(id, el) {
     document.querySelectorAll('section[id^="sec-"]').forEach(s => s.style.display = 'none');
@@ -399,6 +553,7 @@ function showSection(id, el) {
     if (id === 'postulaciones') loadAllApplications();
     if (id === 'guardados') loadSavedJobs();
     if (id === 'alertas') loadAlerts();
+    if (id === 'empresas') loadCompanyRatings();
     if (id === 'perfil') loadProfile();
 }
 
@@ -434,10 +589,12 @@ function filterJobs() {
     const filtered = allJobs.filter(job => {
         const matchesSearch = !search || 
             job.title.toLowerCase().includes(search) || 
-            (job.company_name && job.company_name.toLowerCase().includes(search));
+            (job.company_name && job.company_name.toLowerCase().includes(search)) ||
+            (job.area && job.area.toLowerCase().includes(search));
         const matchesType = !type || job.type === type;
         const matchesLocation = !location || 
-            (job.location && job.location.toLowerCase().includes(location));
+            ((job.location && job.location.toLowerCase().includes(location)) ||
+             (job.company_location && job.company_location.toLowerCase().includes(location)));
         const matchesLevel = !level || job.level === level;
         return matchesSearch && matchesType && matchesLocation && matchesLevel;
     });
@@ -557,7 +714,6 @@ async function applyToJob(jobId) {
         if (!res.ok) throw new Error('Error al postular');
         
         showToast('¡Postulación enviada exitosamente!');
-        // Opcional: actualizar métricas si las tuviéramos
     } catch (err) {
         console.error('Error:', err);
         showToast('Error al enviar postulación', true);
@@ -759,7 +915,7 @@ async function toggleAlert(id, active) {
             body: JSON.stringify({ active })
         });
         if (!res.ok) throw new Error('Error al actualizar');
-        showToast(`Alerta ${active ? 'activada' : 'desactivada'}`);
+        showToast(`Alerta ${active ? 'activada ✅' : 'desactivada'}`);
         loadAlerts();
     } catch(e) { console.error(e); showToast('Error', true); }
 }
@@ -791,12 +947,15 @@ async function loadProfile() {
         currentUser.profile_photo_url = u.profile_photo_url || null;
         sessionStorage.setItem('candidateUser', JSON.stringify(currentUser));
         setUserUI();
-        // Skills: stored as JSON array
         try {
             const skills = u.skills ? JSON.parse(u.skills) : [];
             document.getElementById('profSkills').value = skills.join(', ');
         } catch(e) {
             document.getElementById('profSkills').value = u.skills || '';
+        }
+        if (u.cv_url) {
+            currentUser.cv_url = u.cv_url;
+            updateCvCurrentBlock(u.cv_url, u.cv_url.split('/').pop().split('?')[0]);
         }
     } catch(e) { console.error(e); }
 }
@@ -825,9 +984,9 @@ async function saveProfile() {
             method: 'PUT',
             body: formData
         });
-        if (!res.ok) { showToast('Error al guardar', true); return; }
+        if (!res.ok) { showToast('Error al guardar', 'error'); return; }
         const updated = await res.json();
-        showToast('Perfil actualizado correctamente');
+        showToast('Perfil actualizado correctamente ✓');
         currentUser.first_name = document.getElementById('profFirstName').value;
         currentUser.last_name = document.getElementById('profLastName').value;
         currentUser.profile_photo_url = updated.usuario.profile_photo_url;
@@ -880,21 +1039,358 @@ function statusPill(s) {
     return `<span class="pill ${cls}">${l}</span>`;
 }
 
-function showToast(msg, isError = false) {
-    const el = document.getElementById('toastEl');
-    const msgEl = document.getElementById('toastMsg');
-    const icon = document.getElementById('toastIcon');
-    msgEl.textContent = msg;
-    icon.className = isError ? 'bi bi-x-circle-fill' : 'bi bi-check-circle-fill';
-    el.style.background = isError ? 'var(--danger)' : 'var(--success)';
-    bootstrap.Toast.getOrCreateInstance(el).show();
+function showToast(msg, type = 'success') {
+    // Soporte de llamada antigua: showToast(msg, true) = error
+    if (type === true)  type = 'error';
+    if (type === false) type = 'success';
+
+    const wrap = document.getElementById('svToastWrap');
+    if (!wrap) return;
+
+    const icons = {
+        success: 'bi-check-circle-fill',
+        error:   'bi-x-circle-fill',
+        warning: 'bi-exclamation-triangle-fill',
+        info:    'bi-info-circle-fill'
+    };
+
+    const div = document.createElement('div');
+    div.className = `sv-toast sv-toast-${type}`;
+    div.innerHTML = `
+        <i class="bi ${icons[type] || icons.success}"></i>
+        <span>${msg}</span>
+        <button class="sv-toast-close" onclick="this.closest('.sv-toast').remove()">
+            <i class="bi bi-x"></i>
+        </button>`;
+
+    wrap.appendChild(div);
+    setTimeout(() => {
+        div.classList.add('removing');
+        setTimeout(() => div.remove(), 300);
+    }, 4000);
+}
+
+// ── CV UPLOAD ────────────────────────────────────────────────
+function onCvFileSelected(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+        showToast('Solo se permiten archivos PDF', true);
+        input.value = '';
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('El archivo supera los 5 MB', true);
+        input.value = '';
+        return;
+    }
+    showCvPreview(file);
+}
+
+function showCvPreview(file) {
+    const preview = document.getElementById('cvSelectedPreview');
+    document.getElementById('cvSelectedName').textContent = file.name;
+    document.getElementById('cvSelectedSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+    preview.style.display = 'flex';
+    document.getElementById('cvUploadBtn').style.display = 'inline-flex';
+    document.getElementById('cvDropZone').style.borderColor = 'var(--success)';
+    document.getElementById('cvDropZone').style.background = 'rgba(22,163,74,.04)';
+}
+
+function clearCvSelection() {
+    document.getElementById('profCvFile').value = '';
+    document.getElementById('cvSelectedPreview').style.display = 'none';
+    document.getElementById('cvUploadBtn').style.display = 'none';
+    document.getElementById('cvDropZone').style.borderColor = 'var(--border)';
+    document.getElementById('cvDropZone').style.background = 'rgba(255,255,255,.6)';
+}
+
+function cvDragOver(e) {
+    e.preventDefault();
+    document.getElementById('cvDropZone').style.borderColor = 'var(--primary-l)';
+    document.getElementById('cvDropZone').style.background = 'rgba(26,58,92,.04)';
+}
+
+function cvDragLeave(e) {
+    document.getElementById('cvDropZone').style.borderColor = 'var(--border)';
+    document.getElementById('cvDropZone').style.background = 'rgba(255,255,255,.6)';
+}
+
+function cvDrop(e) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const input = document.getElementById('profCvFile');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    onCvFileSelected(input);
+}
+
+async function uploadCV() {
+    const fileInput = document.getElementById('profCvFile');
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const btn = document.getElementById('cvUploadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Subiendo...';
+
+    try {
+        const formData = new FormData();
+        formData.append('cv', file);
+
+        const res = await fetch(`${API}/api/users/${currentUser.id}/cv`, {
+            method: 'PATCH',
+            body: formData
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Error al subir el CV');
+        }
+
+        const data = await res.json();
+        currentUser.cv_url = data.cv_url;
+        sessionStorage.setItem('candidateUser', JSON.stringify(currentUser));
+
+        updateCvCurrentBlock(data.cv_url, file.name);
+        clearCvSelection();
+        showToast('CV subido correctamente ✓');
+    } catch (err) {
+        showToast(err.message || 'Error de conexión', true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-cloud-arrow-up me-2"></i>Subir CV';
+    }
+}
+
+function updateCvCurrentBlock(url, name) {
+    if (!url) return;
+    const block = document.getElementById('cvCurrentBlock');
+    document.getElementById('cvFileName').textContent = name || 'curriculum.pdf';
+    document.getElementById('cvViewLink').href = url;
+    block.style.display = 'block';
 }
 
 function confirmLogout() {
     if (confirm('¿Cerrar sesión?')) {
         sessionStorage.removeItem('candidateUser');
-        showToast('Sesión cerrada. Redirigiendo…');
+        showToast('Sesión cerrada. Redirigiendo…', 'info');
         setTimeout(() => { window.location.href = '/'; }, 1200);
+    }
+}
+
+// ── CALIFICAR EMPRESAS ───────────────────────────────────────
+let _companyRatingsCache = [];
+
+async function loadCompanyRatings() {
+    if (!currentUser) return;
+    const grid = document.getElementById('companiesGrid');
+    grid.innerHTML = `<div class="col-12 text-center py-4">
+        <i class="bi bi-arrow-clockwise" style="font-size:2rem;opacity:.3"></i>
+        <p class="mt-2" style="color:#888">Cargando empresas...</p></div>`;
+
+    try {
+        const ratingsRes = await fetch(`${API}/api/ratings`);
+        const companies  = await ratingsRes.json();
+        _companyRatingsCache = Array.isArray(companies) ? companies : [];
+
+        if (!_companyRatingsCache.length) {
+            grid.innerHTML = `<div class="col-12"><div class="empty-state">
+                <i class="bi bi-building"></i><p>No hay empresas registradas aún.</p></div></div>`;
+            return;
+        }
+
+        const myRatings = await Promise.all(
+            _companyRatingsCache.map(c =>
+                fetch(`${API}/api/ratings/user/${currentUser.id}/company/${c.id}`)
+                    .then(r => r.ok ? r.json() : null)
+                    .catch(() => null)
+            )
+        );
+
+        grid.innerHTML = _companyRatingsCache.map((c, i) =>
+            `<div class="col-md-4 col-sm-6">${buildCompanyRatingCard(c, myRatings[i])}</div>`
+        ).join('');
+
+    } catch (err) {
+        console.error(err);
+        grid.innerHTML = `<div class="col-12"><div class="empty-state">
+            <i class="bi bi-exclamation-triangle"></i>
+            <p>Error al cargar empresas.</p></div></div>`;
+    }
+}
+
+function buildCompanyRatingCard(company, myRating) {
+    const avg   = company.avg_rating ? Number(company.avg_rating) : 0;
+    const total = Number(company.total_ratings) || 0;
+
+    // Logo: si es URL → <img>, si no → iniciales
+    const logoStr   = company.logo || '';
+    const isUrl     = logoStr.startsWith('http') || logoStr.startsWith('/');
+    const initials  = (company.name || '?').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2);
+    const logoBadge = isUrl
+        ? `<img src="${logoStr}" alt="${company.name}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`
+        : `<span>${initials}</span>`;
+
+    // Estrellas del promedio
+    const starsHtml = [1,2,3,4,5].map(n => {
+        const full = avg >= n, half = !full && avg >= n - 0.5;
+        return `<i class="bi bi-star${full ? '-fill' : half ? '-half' : ''} star-icon${full || half ? ' filled' : ''}" style="font-size:15px"></i>`;
+    }).join('');
+
+    // Estrellas de la calificación del usuario
+    const myStarsHtml = myRating
+        ? [1,2,3,4,5].map(n =>
+            `<i class="bi bi-star${myRating.rating >= n ? '-fill' : ''}" style="font-size:12px;color:${myRating.rating >= n ? '#f59e0b' : '#d1d5db'}"></i>`
+          ).join('')
+        : '';
+
+    const alreadyRated   = !!myRating;
+    const commentPreview = myRating?.comment
+        ? `"${myRating.comment.slice(0, 55)}${myRating.comment.length > 55 ? '…"' : '"'}`
+        : 'Sin comentario';
+
+    const safeName    = (company.name || '').replace(/'/g, "\\'");
+    const safeComment = alreadyRated && myRating.comment
+        ? myRating.comment.replace(/'/g, "\\'").replace(/\n/g, ' ')
+        : '';
+
+    return `
+    <div class="company-rating-card h-100">
+
+        <!-- Logo + nombre + industria -->
+        <div class="d-flex align-items-center gap-3">
+            <div class="company-logo-badge" style="overflow:hidden;background:${isUrl ? 'transparent' : 'rgba(26,58,92,.08)'}">
+                ${logoBadge}
+            </div>
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:15px;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${company.name}</div>
+                <div style="font-size:12px;color:var(--text-m);margin-top:2px">
+                    <i class="bi bi-briefcase me-1" style="opacity:.5"></i>${company.industry || 'Industria no especificada'}
+                </div>
+            </div>
+        </div>
+
+        <!-- Promedio -->
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(26,58,92,.03);border-radius:var(--radius);border:1px solid var(--border)">
+            <div style="font-size:2rem;font-family:var(--font-title);color:var(--primary);line-height:1;min-width:40px;text-align:center">
+                ${avg > 0 ? avg.toFixed(1) : '—'}
+            </div>
+            <div>
+                <div style="display:flex;gap:2px;margin-bottom:3px">${starsHtml}</div>
+                <div style="font-size:11px;color:var(--text-l)">${total} ${total === 1 ? 'calificación' : 'calificaciones'}</div>
+            </div>
+        </div>
+
+        <!-- Mi calificación -->
+        ${alreadyRated ? `
+        <div style="padding:10px 12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);border-radius:var(--radius)">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-m);margin-bottom:5px;text-transform:uppercase">Tu calificación</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <div style="display:flex;gap:2px">${myStarsHtml}</div>
+                <span style="font-size:12px;color:var(--text-m);font-style:italic">${commentPreview}</span>
+            </div>
+        </div>` : ''}
+
+        <!-- Botones -->
+        <div class="d-flex gap-2 mt-auto pt-1">
+            <button class="btn tb-btn-primary flex-fill"
+                    onclick="openRatingModal(${company.id},'${safeName}',${alreadyRated ? myRating.rating : 0},'${safeComment}')">
+                <i class="bi bi-${alreadyRated ? 'pencil-fill' : 'star-fill'} me-1"></i>${alreadyRated ? 'Editar' : 'Calificar'}
+            </button>
+            ${alreadyRated ? `
+            <button class="btn tb-btn-danger" onclick="deleteMyRating(${company.id})" title="Eliminar mi calificación">
+                <i class="bi bi-trash"></i>
+            </button>` : ''}
+        </div>
+    </div>`;
+}
+
+function openRatingModal(companyId, companyName, existingRating, existingComment) {
+    document.getElementById('ratingCompanyId').value = companyId;
+    document.getElementById('ratingModalTitle').textContent = `Calificar: ${companyName}`;
+    document.getElementById('ratingComment').value = existingComment || '';
+    document.getElementById('starLabel').textContent = '';
+
+    // Reset radios
+    document.querySelectorAll('#starsInput input[name="star"]').forEach(r => r.checked = false);
+
+    // Pre-seleccionar rating existente
+    if (existingRating) {
+        const radio = document.querySelector(`#starsInput input[value="${existingRating}"]`);
+        if (radio) {
+            radio.checked = true;
+            updateStarLabel(existingRating);
+        }
+    }
+
+    // Escuchar cambios de estrella para label
+    document.querySelectorAll('#starsInput input[name="star"]').forEach(r => {
+        r.onchange = () => updateStarLabel(r.value);
+    });
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('ratingModal')).show();
+}
+
+function updateStarLabel(val) {
+    const labels = { '1':'😞 Muy malo', '2':'😕 Malo', '3':'😐 Regular', '4':'😊 Bueno', '5':'🤩 Excelente' };
+    document.getElementById('starLabel').textContent = labels[val] || '';
+}
+
+async function submitRating() {
+    const companyId = document.getElementById('ratingCompanyId').value;
+    const comment   = document.getElementById('ratingComment').value.trim();
+    const selected  = document.querySelector('#starsInput input[name="star"]:checked');
+
+    if (!selected) {
+        showToast('Selecciona una calificación de 1 a 5 estrellas', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('ratingSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+
+    try {
+        const res = await fetch(`${API}/api/ratings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id:    currentUser.id,
+                company_id: Number(companyId),
+                rating:     Number(selected.value),
+                comment:    comment || null
+            })
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || 'Error al guardar');
+        }
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('ratingModal')).hide();
+        showToast(`¡Calificación guardada! ${'⭐'.repeat(Number(selected.value))}`);
+        loadCompanyRatings(); // Recargar las cards con el nuevo promedio
+
+    } catch (err) {
+        showToast(err.message || 'Error al guardar calificación', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-star-fill me-2"></i>Guardar Calificación';
+    }
+}
+
+async function deleteMyRating(companyId) {
+    if (!confirm('¿Eliminar tu calificación de esta empresa?')) return;
+    try {
+        const res = await fetch(`${API}/api/ratings/${currentUser.id}/${companyId}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Error al eliminar');
+        showToast('Calificación eliminada');
+        loadCompanyRatings();
+    } catch (err) {
+        showToast('Error al eliminar calificación', 'error');
     }
 }
 </script>
