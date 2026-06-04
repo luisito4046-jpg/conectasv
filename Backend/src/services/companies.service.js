@@ -23,13 +23,24 @@ export const findCompaniesByName = async (nombre) => {
     return result.rows;
 };
 
-export const insertCompany = async ({ owner_id, name, logo, industry, size, website, description, location }) => {
+export const insertCompany = async ({ owner_id, name, logo_url, industry, size, website, description, location }) => {
+    // Un employer solo puede tener una empresa
+    const existing = await pool.query(
+        'SELECT id FROM companies WHERE owner_id = $1 LIMIT 1',
+        [owner_id]
+    );
+    if (existing.rowCount > 0) {
+        const err = new Error('Este usuario ya tiene una empresa registrada');
+        err.code = 'COMPANY_ALREADY_EXISTS';
+        throw err;
+    }
+
     const result = await pool.query(
         `INSERT INTO companies
-             (owner_id, name, logo, industry, size, website, description, location)
+             (owner_id, name, logo_url, industry, size, website, description, location)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [owner_id, name, logo ?? null, industry ?? null, size ?? null,
+        [owner_id, name, logo_url ?? null, industry ?? null, size ?? null,
          website ?? null, description ?? null, location ?? null]
     );
     return result.rows[0];
@@ -39,7 +50,7 @@ export const insertCompany = async ({ owner_id, name, logo, industry, size, webs
 // Incluye logo_url para soportar subida de logo a Cloudinary
 export const updateCompany = async (id, data) => {
     const fields = [
-        'name', 'logo', 'logo_url', 'industry', 'size',
+        'name', 'logo_url', 'industry', 'size',
         'website', 'description', 'location', 'verified'
     ];
 

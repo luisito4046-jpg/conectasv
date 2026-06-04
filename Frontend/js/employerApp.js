@@ -99,10 +99,25 @@ window.loadEmployerJobs = async function () {
                 : job.salary_max ? `Hasta $${Number(job.salary_max).toLocaleString()}`
                 : 'No especificado';
 
+            // Logo de empresa en la card de vacante
+            const logoUrl = currentUser?.company_logo_url ?? job.company_logo_url ?? null;
+            const logoHTML = logoUrl
+                ? `<img src="${logoUrl}" alt="Logo"
+                        style="width:40px;height:40px;border-radius:8px;object-fit:cover;
+                               border:1px solid rgba(0,0,0,.08);flex-shrink:0">`
+                : `<div style="width:40px;height:40px;border-radius:8px;flex-shrink:0;
+                               background:var(--accent,#e8943a);color:#fff;
+                               display:flex;align-items:center;justify-content:center;
+                               font-size:16px;font-weight:700">
+                       ${(currentUser?.first_name ?? job.company_name ?? '?')[0].toUpperCase()}
+                   </div>`;
+
             return `
             <div class="tb-card" style="border-left:3px solid var(--${statusColors[job.status] || 'secondary'})">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div>
+                    <div class="d-flex align-items-center gap-3">
+                        ${logoHTML}
+                        <div>
                         <h6 class="mb-1" style="font-weight:700;color:var(--tb-heading,#1a1a2e)">${job.title}</h6>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
                             <span class="badge bg-${statusColors[job.status] || 'secondary'} bg-opacity-10 text-${statusColors[job.status] || 'secondary'}" 
@@ -116,6 +131,7 @@ window.loadEmployerJobs = async function () {
                             <span style="font-size:12px;color:#888">
                                 <i class="bi bi-cash me-1"></i>${salary}
                             </span>
+                        </div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -384,8 +400,7 @@ window.deleteEmployerJob = async function (jobId) {
 
         showToastNotif('Vacante eliminada');
         loadEmployerJobs();
-
-        // Ocultar tabla de postulantes si estaba visible
+        
         const card = document.getElementById('candidateTableCard');
         if (card) card.style.display = 'none';
 
@@ -423,6 +438,222 @@ window.uploadProfilePhoto = async function () {
         showToastNotif('Foto de perfil actualizada');
     } catch (err) {
         showToastNotif('Error de conexión al subir foto', 'error');
+    }
+};
+
+// ── GUARDAR PERFIL DE EMPRESA (soporta logo via FormData) ────
+window.saveCompanyProfile = async function () {
+    const companyId = currentUser?.company_id ?? null;
+
+    const name        = document.getElementById('companyName')?.value.trim()         ?? '';
+    const industry    = document.getElementById('companyIndustry')?.value.trim()     ?? '';
+    const size        = document.getElementById('companySize')?.value                ?? '';
+    const website     = document.getElementById('companyWebsite')?.value.trim()      ?? '';
+    const location    = document.getElementById('companyLocation')?.value.trim()     ?? '';
+    const description = document.getElementById('companyDescription')?.value.trim()  ?? '';
+    const logoFile    = document.getElementById('companyLogoInput')?.files[0]        ?? null;
+
+    if (!name) {
+        showToastNotif('El nombre de la empresa es obligatorio', 'error');
+        return;
+    }
+
+    try {
+        let res;
+
+        if (companyId) {
+            // ── EDITAR empresa existente (PUT) ────────────────────────
+            if (logoFile) {
+                const formData = new FormData();
+                formData.append('name',        name);
+                formData.append('industry',    industry);
+                formData.append('size',        size);
+                formData.append('website',     website);
+                formData.append('location',    location);
+                formData.append('description', description);
+                formData.append('company_logo', logoFile);
+                res = await fetch(`/api/companies/${companyId}`, { method: 'PUT', body: formData });
+            } else {
+                res = await fetch(`/api/companies/${companyId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, industry, size, website, location, description })
+                });
+            }
+        } else {
+            // ── CREAR empresa nueva (POST) ────────────────────────────
+            res = await fetch('/api/companies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    owner_id: currentUser.id,
+                    name, industry, size, website, location, description
+                })
+            });
+        }
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+            showToastNotif(data.error || 'Error al guardar perfil de empresa', 'error');
+            return;
+        }
+
+        // Si se creó empresa nueva, guardar el company_id en sesión
+        const company = data.empresa ?? data;
+        if (!companyId && company?.id) {
+            currentUser.company_id = company.id;
+            const key = currentUser.role === 'employer' ? 'employerUser' : 'candidateUser';
+            sessionStorage.setItem(key, JSON.stringify(currentUser));
+
+            // Ocultar el aviso de "sin empresa" si existe
+            const noCompanyBanner = document.getElementById('noCompanyBanner');
+            if (noCompanyBanner) noCompanyBanner.style.display = 'none';
+        }
+
+        // Actualizar vista previa del logo si el backend devuelve la URL
+        const logoUrl = company?.logo_url ?? data?.logo_url ?? null;
+        if (logoUrl) {
+            const preview = document.getElementById('companyLogoPreview');
+            if (preview) { preview.src = logoUrl; preview.style.display = 'block'; }
+
+            if (currentUser) {
+                currentUser.company_logo_url = logoUrl;
+                currentUser.profile_photo_url = logoUrl; // Make the profile photo the logo
+                const key = currentUser.role === 'employer' ? 'employerUser' : 'candidateUser';
+                sessionStorage.setItem(key, JSON.stringify(currentUser));
+                
+                const avatar = document.getElementById('employerAvatar');
+                if (avatar) avatar.src = logoUrl;
+                
+                const topAvatar = document.getElementById('topbarAvatar');
+                if (topAvatar) {
+                    topAvatar.style.backgroundImage = `url("${logoUrl}")`;
+                    topAvatar.style.backgroundSize = 'cover';
+                    topAvatar.style.backgroundPosition = 'center';
+                    topAvatar.style.backgroundColor = 'transparent';
+                    topAvatar.textContent = '';
+                }
+            }
+        }
+
+        showToastNotif(companyId ? 'Perfil de empresa actualizado' : '¡Empresa creada correctamente!');
+
+    } catch (err) {
+        console.error('saveCompanyProfile error:', err);
+        showToastNotif('Error de conexión al guardar perfil', 'error');
+    }
+};
+
+// ── AVATAR/LOGO DE EMPRESA (clickeable en detalle de empleo) ──
+window.buildCompanyAvatar = function (job, size = 56, clickable = false) {
+    const click = clickable && job.company_id
+        ? `onclick="openCompanyProfile(${job.company_id})" title="Ver perfil de empresa" style="cursor:pointer"`
+        : '';
+    const sizeCSS = `width:${size}px;height:${size}px;border-radius:12px;flex-shrink:0;`;
+
+    if (job.company_logo_url) {
+        return `<img src="${job.company_logo_url}" alt="${job.company_name ?? ''}"
+                     ${click}
+                     style="${sizeCSS}object-fit:cover;border:2px solid rgba(0,0,0,.06)">`;
+    }
+
+    const initial = (job.company_name ?? '?')[0].toUpperCase();
+    const fontSize = Math.round(size * 0.36);
+    return `<div ${click}
+                 style="${sizeCSS}background:var(--accent,#e8943a);color:#fff;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:${fontSize}px;font-weight:700;
+                        ${clickable ? 'cursor:pointer;' : ''}">
+                ${initial}
+            </div>`;
+};
+
+// ── MODAL DE PERFIL DE EMPRESA ────────────────────────────────
+window.openCompanyProfile = async function (companyId) {
+    if (!companyId) return;
+
+    const body  = document.getElementById('companyProfileBody');
+    const modal = new bootstrap.Modal(document.getElementById('companyProfileModal'));
+
+    body.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-warning" role="status"></div>
+            <p class="mt-2 small" style="color:#888">Cargando perfil...</p>
+        </div>`;
+    modal.show();
+
+    try {
+        const res = await fetch(`/api/companies/${companyId}`);
+        if (!res.ok) throw new Error('not found');
+        const c = await res.json();
+
+        const logoHTML = c.logo_url
+            ? `<img src="${c.logo_url}" alt="${c.name}"
+                    style="width:80px;height:80px;border-radius:16px;object-fit:cover;
+                           border:2px solid rgba(0,0,0,.08)">`
+            : `<div style="width:80px;height:80px;border-radius:16px;
+                           background:var(--accent,#e8943a);color:#fff;
+                           display:flex;align-items:center;justify-content:center;
+                           font-size:32px;font-weight:700">
+                   ${(c.name ?? '?')[0].toUpperCase()}
+               </div>`;
+
+        const sizeLabels = { small: 'Pequeña (1–50)', medium: 'Mediana (51–200)', large: 'Grande (200+)' };
+
+        body.innerHTML = `
+            <div class="d-flex align-items-center gap-3 mb-4">
+                ${logoHTML}
+                <div>
+                    <h4 class="mb-0" style="font-weight:700">${c.name ?? '—'}</h4>
+                    ${c.industry
+                        ? `<span class="badge rounded-pill mt-1"
+                                  style="background:rgba(232,148,58,.15);color:var(--accent,#e8943a);
+                                         font-size:12px;font-weight:600">
+                               ${c.industry}
+                           </span>`
+                        : ''}
+                </div>
+            </div>
+            <div class="row g-3">
+                ${c.location ? `
+                <div class="col-md-6">
+                    <p class="tb-label mb-1">Ubicación</p>
+                    <p style="font-size:14px"><i class="bi bi-geo-alt me-1" style="color:var(--accent,#e8943a)"></i>${c.location}</p>
+                </div>` : ''}
+                ${c.size ? `
+                <div class="col-md-6">
+                    <p class="tb-label mb-1">Tamaño</p>
+                    <p style="font-size:14px"><i class="bi bi-people me-1" style="color:var(--accent,#e8943a)"></i>${sizeLabels[c.size] ?? c.size}</p>
+                </div>` : ''}
+                ${c.website ? `
+                <div class="col-md-6">
+                    <p class="tb-label mb-1">Sitio Web</p>
+                    <p style="font-size:14px">
+                        <a href="${c.website}" target="_blank" rel="noopener"
+                           style="color:var(--accent,#e8943a);text-decoration:none">
+                            <i class="bi bi-link-45deg me-1"></i>${c.website}
+                        </a>
+                    </p>
+                </div>` : ''}
+                ${c.founded_year ? `
+                <div class="col-md-6">
+                    <p class="tb-label mb-1">Fundada</p>
+                    <p style="font-size:14px"><i class="bi bi-calendar me-1" style="color:var(--accent,#e8943a)"></i>${c.founded_year}</p>
+                </div>` : ''}
+                ${c.description ? `
+                <div class="col-12">
+                    <p class="tb-label mb-1">Sobre la Empresa</p>
+                    <p style="font-size:14px;line-height:1.6">${c.description}</p>
+                </div>` : ''}
+            </div>`;
+
+    } catch {
+        body.innerHTML = `
+            <div class="text-center py-4">
+                <i class="bi bi-building-x" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 small" style="color:#888">No se encontró información de la empresa.</p>
+            </div>`;
     }
 };
 

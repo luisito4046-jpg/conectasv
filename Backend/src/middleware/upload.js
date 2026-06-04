@@ -29,7 +29,7 @@ export const uploadLogo = multer({
     }
 }).single('company_logo');
 
-// ✅ NUEVO: Middleware para subida de CV en PDF
+// NUEVO: Middleware para subida de CV en PDF
 export const uploadCV = multer({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
@@ -57,7 +57,7 @@ export const uploadToCloudinary = (buffer, publicId, folder = 'conectasv/profile
     });
 };
 
-// ✅ NUEVO: Para PDFs — sin transformación de imagen, resource_type: 'raw'
+// NUEVO: Para PDFs — sin transformación de imagen, resource_type: 'raw'
 export const uploadToCloudinaryRaw = (buffer, publicId, folder = 'conectasv/cvs') => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(

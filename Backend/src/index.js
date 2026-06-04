@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 // TODAS las importaciones juntas al inicio del archivo
 import usersRouter from './routes/users.routes.js';
-import uploadRouter from './routes/upload.routes.js';  // rutas de archivos separadas
+import uploadRouter from './routes/upload.routes.js'; 
 import companiesRouter from './routes/companies.routes.js';
 import loginRouter from './routes/login.routes.js';
 import jobsRouter from './routes/jobs.routes.js';

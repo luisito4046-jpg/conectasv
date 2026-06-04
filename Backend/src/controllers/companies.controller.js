@@ -48,6 +48,9 @@ export const postCrearEmpresa = async (req, res) => {
         const company = await insertCompany(req.body);
         res.status(201).json(company);
     } catch (err) {
+        if (err.code === 'COMPANY_ALREADY_EXISTS') {
+            return res.status(409).json({ error: err.message });
+        }
         res.status(500).json({ error: err.message });
     }
 };
@@ -59,7 +62,6 @@ export const actualizarEmpresa = async (req, res) => {
     try {
         const companyData = { ...req.body };
 
-        // Si se subió un logo, subirlo a Cloudinary y guardar la URL en logo_url
         if (req.file) {
             const publicId = `company_${req.params.id}_${Date.now()}`;
             const result   = await uploadToCloudinary(req.file.buffer, publicId, 'conectasv/logos');

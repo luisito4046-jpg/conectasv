@@ -9,7 +9,6 @@ async function login() {
     const password = document.getElementById('loginPassword').value;
     const errorEl  = document.getElementById('loginError');
 
-    // Limpiar error anterior
     errorEl.textContent = '';
     errorEl.style.display = 'none';
 
@@ -28,7 +27,6 @@ async function login() {
         const data = await res.json();
 
         if (!res.ok) {
-            // 401 credenciales, 403 suspendido, 500 servidor
             showLoginError(data.error || 'Error al iniciar sesión.');
             return;
         }
@@ -77,7 +75,7 @@ async function register() {
     const role = activeBtn ? activeBtn.dataset.role : 'candidate';
 
     // Validaciones
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || (!lastName && role !== 'employer') || !email || !password) {
         showToastNotif('Por favor completa todos los campos.', 'error');
         return;
     }
@@ -122,7 +120,7 @@ async function register() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         owner_id: data.id,
-                        name: `${firstName} ${lastName}`,
+                        name: `${firstName} ${lastName}`.trim(),
                         description: '',
                         industry: '',
                         location: ''
@@ -245,18 +243,21 @@ function updateNavbar(user) {
     const avatarEl = document.getElementById('navAvatar');
 
     // ── Foto de perfil o iniciales ────────────────────────────
-    if (user.profile_photo_url) {
+    if (user.logo_url || user.profile_photo_url) {
         avatarEl.innerHTML = '';
-        avatarEl.style.backgroundImage    = `url('${user.profile_photo_url}')`;
+        avatarEl.style.backgroundImage    = `url('${user.logo_url || user.profile_photo_url}')`;
         avatarEl.style.backgroundSize     = 'cover';
         avatarEl.style.backgroundPosition = 'center';
         avatarEl.textContent = '';
     } else {
         avatarEl.style.backgroundImage = '';
-        avatarEl.textContent = `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+        const f = user.first_name ? user.first_name[0] : '';
+        const l = user.last_name ? user.last_name[0] : '';
+        avatarEl.textContent = `${f}${l}`.toUpperCase();
     }
 
-    document.getElementById('navUserName').textContent = `${user.first_name} ${user.last_name}`;
+    const dName = user.last_name ? `${user.first_name} ${user.last_name}` : user.first_name;
+    document.getElementById('navUserName').textContent = dName;
 
     // ── El avatar lleva al panel correspondiente al rol ───────
     const profileLink = document.getElementById('navProfileLink');

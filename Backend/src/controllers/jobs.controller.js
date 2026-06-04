@@ -45,7 +45,6 @@ export const createJob = async (req, res) => {
 
 export const updateJobHandler = async (req, res) => {
     try {
-        // Actualización parcial: solo status
         if (Object.keys(req.body).length === 1 && req.body.status) {
             const job = await patchJobStatus(req.params.id, req.body.status);
             if (!job) return res.status(404).json({ error: 'No encontrado' });

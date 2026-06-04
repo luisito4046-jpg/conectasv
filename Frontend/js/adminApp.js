@@ -104,7 +104,6 @@ function showSection(id, el) {
     if (topTitle) topTitle.textContent = SECTION_TITLES[id] || id;
     closeSidebar();
 
-    // Cargar datos según la sección
     if (id === 'usuarios') loadUsers();
     if (id === 'empresas') loadCompanies();
     if (id === 'empleos') loadJobs();
@@ -467,7 +466,6 @@ async function saveJob() {
                 body: JSON.stringify(data)
             });
         } else {
-            // Para crear, agregar posted_by (asumimos que el admin es el ID 1 o el actual)
             res = await fetch(`${API}/api/jobs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -510,7 +508,6 @@ function newJob() {
     document.getElementById('jobType').value = 'full';
     document.getElementById('jobLevel').value = 'mid';
     
-    // Poblar datalist de empresas
     const datalist = document.getElementById('companiesList');
     datalist.innerHTML = allCompanies.map(c => `<option value="${c.name}" label="${c.industry || ''}">`).join('');
     
@@ -648,7 +645,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error en inicialización:', err);
     }
 
-    // Cerrar modales cuando se presiona Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             bootstrap.Modal.getOrCreateInstance(document.getElementById('userModal')).hide();
@@ -660,7 +656,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function confirmLogout() {
     if (confirm('¿Cerrar sesión?')) {
-        // Limpiar datos de sesión si es necesario
         window.location.href = '/';
     }
 }
